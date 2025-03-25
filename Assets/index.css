@@ -11,7 +11,7 @@ body {
 	height: 100%;
 	min-width: 500px;
 	background-color: #FFF4E0;
-	padding-top: 50px;
+	padding-top: 20px;
 	padding-bottom: 50px;
 }
 
@@ -51,6 +51,7 @@ h1 {
 	border-radius: 12px;
 	box-shadow: 5px 5px black;
 	border: 5px solid black;
+	color: black;
 }
 
 .toggle-play-button {
@@ -60,6 +61,7 @@ h1 {
 	border: 5px solid black;
 	border-radius: 12px;
 	box-shadow: 5px 5px black;
+	color: black;
 }
 
 .tetris-board {
@@ -105,7 +107,7 @@ ul {
 * I opted to just use a media
 * query for phone use
 */
-@media (max-width: 1000px) {
+@media (max-width: 985px) {
 	.body {
 		width: 80%;
 	}
@@ -120,11 +122,13 @@ ul {
 	}
 
 	.toggle-play-button {
-		font-size: 3rem;
+		font-size: 4rem;
+		box-shadow: 15px 15px black;
 	}
 
 	.reset-button {
-		font-size: 3rem;
+		font-size: 4rem;
+		box-shadow: 15px 15px black;
 	}
 
 	.score-section {
@@ -139,4 +143,16 @@ ul {
 		border-radius: 12px;
 		border-width: 4px;
 	}
+
+	.score-box,
+	.tetris-board {
+		border-width: 12px;
+		box-shadow: 15px 15px black;
+	}
+
+	.tetris-board {
+		margin-bottom: 40px;
+		margin-top: 30px;
+	}
+
 }
