@@ -1,0 +1,142 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: 'Montserrat';
+	box-sizing: border-box;
+}
+
+body {
+	display: flex;
+	justify-content: center;
+	height: 100%;
+	min-width: 500px;
+	background-color: #FFF4E0;
+	padding-top: 50px;
+	padding-bottom: 50px;
+}
+
+h1 {
+	font-weight: bold;
+	text-align: center;
+}
+
+.score-section {
+	display: flex;
+	gap: 25px;
+	justify-content: center;
+	align-content: center;
+	margin-bottom: 5px;
+}
+
+.score-box {
+	background-color: #FFF;
+	padding: 10px;
+	margin-left: 5px;
+	margin-right: 15px;
+	border: 5px solid black;
+	border-radius: 12px;
+	box-shadow: 5px 5px black;
+}
+
+.buttons {
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.reset-button {
+	padding: 12px;
+	font-weight: bold;
+	background-color: #FD9745;
+	border-radius: 12px;
+	box-shadow: 5px 5px black;
+	border: 5px solid black;
+}
+
+.toggle-play-button {
+	padding: 12px;
+	font-weight: bold;
+	background-color: #FD9745;
+	border: 5px solid black;
+	border-radius: 12px;
+	box-shadow: 5px 5px black;
+}
+
+.tetris-board {
+	background-color: #FD9745;
+	flex-grow: 1;
+	border: 5px solid black;
+	border-radius: 12px;
+	box-shadow: 5px 5px black;
+}
+
+
+h2 {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+.tetris-block {
+	width: 100%;
+	padding: 40%;
+	border: 2px solid black;
+	border-radius: 5px;
+	background-color: #FFF4E0;
+}
+
+ul {
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(10, 1fr);
+	grid-template-rows: repeat(20, 1fr);
+	padding: 10px;
+}
+
+.body {
+	margin-top: auto;
+	margin-bottom: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+/* I was fighting a loosing 
+* battle with the css, so
+* I opted to just use a media
+* query for phone use
+*/
+@media (max-width: 1000px) {
+	.body {
+		width: 80%;
+	}
+
+	html,
+	body {
+		overflow: hidden;
+	}
+
+	body {
+		position: relative;
+	}
+
+	.toggle-play-button {
+		font-size: 3rem;
+	}
+
+	.reset-button {
+		font-size: 3rem;
+	}
+
+	.score-section {
+		font-size: 3rem;
+	}
+
+	h1 {
+		font-size: 5rem;
+	}
+
+	.tetris-block {
+		border-radius: 12px;
+		border-width: 4px;
+	}
+}
