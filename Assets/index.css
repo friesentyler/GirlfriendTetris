@@ -41,27 +41,57 @@ h1 {
 .buttons {
 	margin-top: 10px;
 	display: flex;
+	gap: 20px;
 	justify-content: space-evenly;
 }
 
 .reset-button {
-	padding: 12px;
-	font-weight: bold;
-	background-color: #FD9745;
+	background: black;
 	border-radius: 12px;
-	box-shadow: 5px 5px black;
-	border: 5px solid black;
-	color: black;
+	border: none;
+	padding: 0;
+	padding-right: 6px;
+	cursor: pointer;
 }
 
 .toggle-play-button {
-	padding: 12px;
+	background: black;
+	border-radius: 12px;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	padding-right: 6px;
+}
+
+.play-front {
+	display: block;
+	border: 5px solid black;
 	font-weight: bold;
+	padding: 12px 22px;
+	border-radius: 12px;
+	font-size: 1.25rem;
+	color: black;
 	background-color: #FD9745;
+	transform: translateY(-6px);
+}
+
+.reset-front {
+	display: block;
+	padding: 12px 22px;
 	border: 5px solid black;
 	border-radius: 12px;
-	box-shadow: 5px 5px black;
+	font-size: 1.25rem;
 	color: black;
+	font-weight: bold;
+	background-color: #FD9745;
+	transform: translateY(-6px);
+
+}
+
+.toggle-play-button:active .play-front,
+.reset-button:active .reset-front {
+	transform: translateY(-2px);
+	transform: translateX(3px);
 }
 
 .tetris-board {
@@ -119,16 +149,28 @@ ul {
 
 	body {
 		position: relative;
+		touch-action: manipulation;
+		-webkit-user-select: none;
+		user-select: none;
 	}
 
-	.toggle-play-button {
-		font-size: 4rem;
-		box-shadow: 15px 15px black;
-	}
-
+	.toggle-play-button,
 	.reset-button {
+		padding-right: 12px;
+		padding-bottom: 6px;
+	}
+
+	.reset-front,
+	.play-front {
 		font-size: 4rem;
-		box-shadow: 15px 15px black;
+		border-width: 10px;
+		border-radius: 15px;
+	}
+
+	.toggle-play-button:active .play-front,
+	.reset-button:active .reset-front {
+		transform: translateY(-4px);
+		transform: translateX(4px);
 	}
 
 	.score-section {
