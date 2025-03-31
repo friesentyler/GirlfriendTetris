@@ -7,9 +7,22 @@ function main() {
 	console.log("Game started!");
 	const userGame = new Game();
 	console.log(userGame.gameBoard);
-	console.log(tetriminoModule.TTetrimino);
+	//console.log(tetriminoModule.TTetrimino);
 	userGame.addPieceToBoard(tetriminoModule.TTetrimino);
-	console.log(userGame.gameBoard);
+	let reset = document.querySelector('.reset-button');
+	reset.addEventListener('click', (event) => {
+		userGame.exertGravityOnBoard();
+		console.log(userGame.gameBoard);
+	});
+	document.addEventListener('keydown', (event) => {
+		console.log(event.code);
+		if (event.code === "ArrowLeft") {
+			userGame.movePieceLeft();
+		} else if (event.code === "ArrowRight") {
+			userGame.movePieceRight();
+		}
+		console.log(userGame.gameBoard);
+	});
 }
 
 // first off I should make something that represents just the tetris logic by itself
