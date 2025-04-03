@@ -1,3 +1,4 @@
+import * as tetriminoModule from './tetriminos.js';
 
 class Game {
 
@@ -12,7 +13,8 @@ class Game {
 		return Array.from(Array(rows), () => new Array(columns).fill(0));
 	}
 
-	addPieceToBoard(piece) {
+	addPieceToBoard() {
+		let piece = this.randomlyChoosePiece();
 		this.activePiece = [];
 		for (let col = 3; col <= 5; col++) {
 			for (let row = 0; row <= 2; row++) {
@@ -40,6 +42,8 @@ class Game {
 		} else {
 			// need to put random piece generation here
 			console.log("Generate new piece!");
+			this.addPieceToBoard();
+			return 1;
 		}
 	}
 
@@ -138,10 +142,47 @@ class Game {
 	}
 
 	slamPiece() {
+		while (this.exertGravityOnBoard() !== 1) {
+			console.log("slamming!");
+		}
+		this.clearLines();
 	}
 
 	clearLines() {
-		// needs to run after every tick to check if there are lines to be cleared
+		for (let i = this.rows - 1; i >= 0; i--) {
+			let isRowFull = this.gameBoard[i].reduce((accumulator, currentValue) => {
+				return accumulator * currentValue;
+			}, 1);
+			if (isRowFull === 1) {
+				this.gameBoard[i] = this.gameBoard[i].map(x => x = 0);
+				this.shiftBoardDown(i);
+			}
+		}
+	}
+
+	shiftBoardDown(row) {
+		if (row === 0) {
+			return;
+		} else {
+			let tempRow = this.gameBoard[row - 1].map(x => x);
+			this.gameBoard[row - 1] = this.gameBoard[row].map(x => x = 0);
+			this.gameBoard[row] = tempRow;
+			return this.shiftBoardDown(row - 1);
+		}
+	}
+
+	generatePieceOutline() {
+	}
+
+	rotatePiece() {
+	}
+
+	randomlyChoosePiece() {
+		let tetriminos = [tetriminoModule.TTetrimino, tetriminoModule.LReverseTetrimino, tetriminoModule.LTetrimino];
+		let min = Math.ceil(0);
+		let max = Math.floor(tetriminos.length);
+		let randomNumber = Math.floor(Math.random() * (max - min) + min);
+		return tetriminos[randomNumber];
 	}
 }
 

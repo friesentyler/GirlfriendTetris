@@ -8,10 +8,13 @@ function main() {
 	const userGame = new Game();
 	console.log(userGame.gameBoard);
 	//console.log(tetriminoModule.TTetrimino);
-	userGame.addPieceToBoard(tetriminoModule.TTetrimino);
+	userGame.addPieceToBoard();
+	// DELETE ME
+	userGame.gameBoard[19] = [1, 1, 1, 1, 1, 1, 0, 1, 1, 1];
 	let reset = document.querySelector('.reset-button');
 	reset.addEventListener('click', (event) => {
 		userGame.exertGravityOnBoard();
+		userGame.clearLines();
 		console.log(userGame.gameBoard);
 	});
 	document.addEventListener('keydown', (event) => {
@@ -20,6 +23,8 @@ function main() {
 			userGame.movePieceLeft();
 		} else if (event.code === "ArrowRight") {
 			userGame.movePieceRight();
+		} else if (event.code === "Space") {
+			userGame.slamPiece();
 		}
 		console.log(userGame.gameBoard);
 	});

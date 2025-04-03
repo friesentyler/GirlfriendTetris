@@ -2,7 +2,7 @@
 export let LTetrimino = [
 	[1, 0, 0],
 	[1, 0, 0],
-	[1, 1, 1]
+	[1, 1, 0]
 ];
 
 export let TTetrimino = [
@@ -14,5 +14,5 @@ export let TTetrimino = [
 export let LReverseTetrimino = [
 	[0, 0, 1],
 	[0, 0, 1],
-	[1, 1, 1]
+	[0, 1, 1]
 ];
