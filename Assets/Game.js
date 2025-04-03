@@ -16,8 +16,8 @@ class Game {
 	addPieceToBoard() {
 		let piece = this.randomlyChoosePiece();
 		this.activePiece = [];
-		for (let col = 3; col <= 5; col++) {
-			for (let row = 0; row <= 2; row++) {
+		for (let col = 3; col < piece[0].length + 3; col++) {
+			for (let row = 0; row < piece.length; row++) {
 				this.gameBoard[row][col] = piece[row][col - 3];
 				if (this.gameBoard[row][col] == 1) {
 					this.activePiece.push([row, col]);
@@ -111,6 +111,26 @@ class Game {
 
 	}
 
+	validFlip(pieceCoords) {
+		// ok I don't really like doing this since we modify the board state in the validFlip checker
+		// but it seemed like the easiest most efficient way to do it. We do reset the board state back
+		// to the original before finishing the function though, so in all reality it should be fine.
+		let flag = true;
+		for (let i = 0; i < this.activePiece.length; i++) {
+			this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
+		}
+		for (let i = 0; i < pieceCoords.length; i++) {
+			// this checks the bounds of the board and that the current blocks are not overlapping with existing ones
+			if (pieceCoords[i][0] >= this.rows || pieceCoords[i][0] < 0 || pieceCoords[i][1] < 0 || pieceCoords[i][1] >= this.cols || this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] === 1) {
+				flag = false;
+			}
+		}
+		for (let i = 0; i < this.activePiece.length; i++) {
+			this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1;
+		}
+		return flag;
+	}
+
 	movePieceLeft() {
 		let hypotheticalPiece = this.activePiece.map((input) => {
 			return [input[0], input[1] - 1];
@@ -175,10 +195,47 @@ class Game {
 	}
 
 	rotatePiece() {
+		// finding coords so that we don't go out of bounds when filling our piece matrix
+		let minRow = Infinity, minCol = Infinity;
+		let maxRow = -Infinity, maxCol = -Infinity;
+		for (let i = 0; i < this.activePiece.length; i++) {
+			minRow = Math.min(minRow, this.activePiece[i][0]);
+			minCol = Math.min(minCol, this.activePiece[i][1]);
+			maxRow = Math.max(maxRow, this.activePiece[i][0]);
+			maxCol = Math.max(maxCol, this.activePiece[i][1]);
+		}
+		let pieceMatrix = Array.from(Array(maxRow - minRow + 1), () => new Array(maxCol - minCol + 1).fill(0));
+		for (let i = 0; i < this.activePiece.length; i++) {
+			pieceMatrix[this.activePiece[i][0] - minRow][this.activePiece[i][1] - minCol] = 1;
+		}
+		// ok now that our pieceMatrix is filled we can do a little linear algebra trick
+		// to rotate the piece 90 degrees we perform a diagonal flip and then a flip down the vertical
+		pieceMatrix = pieceMatrix[0].map((_, i) => pieceMatrix.map(row => row[i]));
+		pieceMatrix = pieceMatrix.map(row => row.reverse());
+		// last we just check that this flip won't result in a collision or rotating off board
+		let hypotheticalFlip = [];
+		for (let i = 0; i < pieceMatrix.length; i++) {
+			for (let j = 0; j < pieceMatrix[0].length; j++) {
+				if (pieceMatrix[i][j] == 1) {
+					// The -1 on the column is important, it gets rid of an artifact from the rotation
+					// (a translation over to the right by +1) I am honestly not sure why this happens
+					hypotheticalFlip.push([i + minRow, j + minCol]);
+				}
+			}
+		}
+		if (this.validFlip(hypotheticalFlip)) {
+			for (let i = 0; i < this.activePiece.length; i++) {
+				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
+			}
+			this.activePiece = hypotheticalFlip;
+			for (let i = 0; i < this.activePiece.length; i++) {
+				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1;
+			}
+		}
 	}
 
 	randomlyChoosePiece() {
-		let tetriminos = [tetriminoModule.TTetrimino, tetriminoModule.LReverseTetrimino, tetriminoModule.LTetrimino];
+		let tetriminos = [tetriminoModule.TTetrimino, tetriminoModule.LReverseTetrimino, tetriminoModule.LTetrimino, tetriminoModule.ITetrimino];
 		let min = Math.ceil(0);
 		let max = Math.floor(tetriminos.length);
 		let randomNumber = Math.floor(Math.random() * (max - min) + min);

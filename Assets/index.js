@@ -25,6 +25,8 @@ function main() {
 			userGame.movePieceRight();
 		} else if (event.code === "Space") {
 			userGame.slamPiece();
+		} else if (event.code === "ArrowUp") {
+			userGame.rotatePiece();
 		}
 		console.log(userGame.gameBoard);
 	});
