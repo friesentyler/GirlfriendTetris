@@ -7,6 +7,7 @@ class Game {
 		this.cols = 10;
 		this.gameBoard = this.generateGameboard(20, 10);
 		this.activePiece = [];
+		this.shadowPiece = [];
 	}
 
 	generateGameboard(rows, columns) {
@@ -43,6 +44,19 @@ class Game {
 			// need to put random piece generation here
 			console.log("Generate new piece!");
 			this.addPieceToBoard();
+			return 1;
+		}
+	}
+
+	exertGravityOnShadow() {
+		let hypotheticalPiece = this.shadowPiece.map((input) => {
+			return [input[0] + 1, input[1]];
+		});
+		if (this.validGravityMove(hypotheticalPiece)) {
+			for (let i = 0; i < this.shadowPiece.length; i++) {
+				this.shadowPiece[i][0]++;
+			}
+		} else {
 			return 1;
 		}
 	}
@@ -192,6 +206,16 @@ class Game {
 	}
 
 	generatePieceOutline() {
+		for (let i = 0; i < this.shadowPiece.length; i++) {
+			this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = 0;
+		}
+		this.shadowPiece = this.activePiece.map(block => block.slice());
+		while (this.exertGravityOnShadow() !== 1) {
+			console.log("slamming shadow!");
+		}
+		for (let i = 0; i < this.shadowPiece.length; i++) {
+			this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = -1;
+		}
 	}
 
 	rotatePiece() {

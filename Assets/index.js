@@ -21,12 +21,16 @@ function main() {
 		console.log(event.code);
 		if (event.code === "ArrowLeft") {
 			userGame.movePieceLeft();
+			userGame.generatePieceOutline();
 		} else if (event.code === "ArrowRight") {
 			userGame.movePieceRight();
+			userGame.generatePieceOutline();
 		} else if (event.code === "Space") {
 			userGame.slamPiece();
+			userGame.generatePieceOutline();
 		} else if (event.code === "ArrowUp") {
 			userGame.rotatePiece();
+			userGame.generatePieceOutline();
 		}
 		console.log(userGame.gameBoard);
 	});
