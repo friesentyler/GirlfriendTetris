@@ -43,6 +43,7 @@ class Game {
 		} else {
 			// need to put random piece generation here
 			console.log("Generate new piece!");
+			this.clearLines();
 			this.addPieceToBoard();
 			return 1;
 		}
@@ -177,19 +178,22 @@ class Game {
 
 	slamPiece() {
 		while (this.exertGravityOnBoard() !== 1) {
-			console.log("slamming!");
+			//console.log("slamming!");
 		}
-		this.clearLines();
+		//this.clearLines();
 	}
 
 	clearLines() {
-		for (let i = this.rows - 1; i >= 0; i--) {
+		let i = this.rows - 1;
+		while (i >= 0) {
 			let isRowFull = this.gameBoard[i].reduce((accumulator, currentValue) => {
 				return accumulator * currentValue;
 			}, 1);
 			if (isRowFull === 1) {
 				this.gameBoard[i] = this.gameBoard[i].map(x => x = 0);
 				this.shiftBoardDown(i);
+			} else {
+				i--;
 			}
 		}
 	}
@@ -207,14 +211,18 @@ class Game {
 
 	generatePieceOutline() {
 		for (let i = 0; i < this.shadowPiece.length; i++) {
-			this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = 0;
+			if (this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] !== 1) {
+				this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = 0;
+			}
 		}
 		this.shadowPiece = this.activePiece.map(block => block.slice());
 		while (this.exertGravityOnShadow() !== 1) {
-			console.log("slamming shadow!");
+			//console.log("slamming shadow!");
 		}
 		for (let i = 0; i < this.shadowPiece.length; i++) {
-			this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = -1;
+			if (this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] !== 1) {
+				this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = -1;
+			}
 		}
 	}
 

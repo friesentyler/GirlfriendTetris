@@ -10,15 +10,14 @@ function main() {
 	//console.log(tetriminoModule.TTetrimino);
 	userGame.addPieceToBoard();
 	// DELETE ME
-	userGame.gameBoard[19] = [1, 1, 1, 1, 1, 1, 0, 1, 1, 1];
+	//userGame.gameBoard[19] = [1, 1, 1, 1, 1, 1, 0, 1, 1, 1];
 	blitScreen(userGame.gameBoard);
 	let reset = document.querySelector('.reset-button');
 	reset.addEventListener('click', (event) => {
 		userGame.generatePieceOutline();
 		userGame.exertGravityOnBoard();
-		userGame.clearLines();
 		blitScreen(userGame.gameBoard);
-		console.log(userGame.gameBoard);
+		//console.log(userGame.gameBoard);
 	});
 	document.addEventListener('keydown', (event) => {
 		console.log(event.code);
@@ -43,7 +42,7 @@ function main() {
 			userGame.generatePieceOutline();
 			blitScreen(userGame.gameBoard);
 		}
-		console.log(userGame.gameBoard);
+		//console.log(userGame.gameBoard);
 	});
 }
 
