@@ -21,6 +21,48 @@ function main() {
 		blitScreen(userGame.gameBoard);
 	}, 1000);
 
+	document.addEventListener('touchstart', function(event) {
+		touchstartX = event.changedTouches[0].screenX;
+		touchstartY = event.changedTouches[0].screenY;
+	}, false);
+
+	document.addEventListener('touchend', function(event) {
+		touchendX = event.changedTouches[0].screenX;
+		touchendY = event.changedTouches[0].screenY;
+		handleGesture();
+	}, false);
+
+	function handleGesture() {
+		let xDirection = touchendX - touchstartX;
+		let yDirection = touchendY - touchstartY;
+		console.log(xDirection, yDirection);
+		if (Math.abs(xDirection) >= Math.abs(yDirection)) {
+
+			if (touchendX < touchstartX) {
+				userGame.movePieceLeft();
+				userGame.generatePieceOutline();
+				blitScreen(userGame.gameBoard);
+			} else if (touchendX > touchstartX) {
+				userGame.movePieceRight();
+				userGame.generatePieceOutline();
+				blitScreen(userGame.gameBoard);
+			}
+		} else if (Math.abs(xDirection) < Math.abs(yDirection)) {
+			if (touchendY < touchstartY) {
+				console.log('swipe up');
+			} else if (touchendY > touchstartY) {
+				userGame.slamPiece();
+				userGame.generatePieceOutline();
+				blitScreen(userGame.gameBoard);
+			}
+		}
+		if (touchendY === touchstartY) {
+			userGame.rotatePiece();
+			userGame.generatePieceOutline();
+			blitScreen(userGame.gameBoard);
+		}
+	}
+
 	document.addEventListener('keydown', (event) => {
 		console.log(event.code);
 		if (event.code === "ArrowLeft") {
@@ -79,6 +121,10 @@ function blitScreen(board) {
 
 // the next thing that needs to happen is to create the gravity function
 
+var touchstartX = 0;
+var touchstartY = 0;
+var touchendX = 0;
+var touchendY = 0;
 
 main();
 
