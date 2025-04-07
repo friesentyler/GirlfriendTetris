@@ -7,6 +7,7 @@ class Game {
 		this.cols = 10;
 		this.gameBoard = this.generateGameboard(20, 10);
 		this.activePiece = [];
+		this.activeColor = 1;
 		this.shadowPiece = [];
 	}
 
@@ -16,11 +17,15 @@ class Game {
 
 	addPieceToBoard() {
 		let piece = this.randomlyChoosePiece();
+		let color = Math.floor(Math.random() * 5) + 1;
+		this.activeColor = color;
 		this.activePiece = [];
 		for (let col = 3; col < piece[0].length + 3; col++) {
 			for (let row = 0; row < piece.length; row++) {
-				this.gameBoard[row][col] = piece[row][col - 3];
-				if (this.gameBoard[row][col] == 1) {
+				// we multiply by color so that the blit function knows the color based on the 
+				// integer we randomly assign to the piece
+				this.gameBoard[row][col] = piece[row][col - 3] * this.activeColor;
+				if (this.gameBoard[row][col] > 0) {
 					this.activePiece.push([row, col]);
 				}
 			}
@@ -37,7 +42,7 @@ class Game {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
 			}
 			for (let i = 0; i < this.activePiece.length; i++) {
-				this.gameBoard[this.activePiece[i][0] + 1][this.activePiece[i][1]] = 1;
+				this.gameBoard[this.activePiece[i][0] + 1][this.activePiece[i][1]] = 1 * this.activeColor;
 				this.activePiece[i][0]++;
 			}
 		} else {
@@ -76,7 +81,7 @@ class Game {
 			let stringPieceCoord = JSON.stringify([pieceCoords[i][0] + 1, pieceCoords[i][1]]);
 			if (stringPieceCoords.indexOf(stringPieceCoord) == -1) {
 				// this checks for collisions
-				if (this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] == 1) {
+				if (this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] > 0) {
 					return false;
 				}
 			}
@@ -96,7 +101,7 @@ class Game {
 			let stringPieceCoord = JSON.stringify([pieceCoords[i][0], pieceCoords[i][1] - 1]);
 			if (stringPieceCoords.indexOf(stringPieceCoord) == -1) {
 				// this checks for collisions
-				if (this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] == 1) {
+				if (this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] > 0) {
 					return false;
 				}
 			}
@@ -117,7 +122,7 @@ class Game {
 			let stringPieceCoord = JSON.stringify([pieceCoords[i][0], pieceCoords[i][1] + 1]);
 			if (stringPieceCoords.indexOf(stringPieceCoord) == -1) {
 				// this checks for collisions
-				if (this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] == 1) {
+				if (this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] > 0) {
 					return false;
 				}
 			}
@@ -136,12 +141,12 @@ class Game {
 		}
 		for (let i = 0; i < pieceCoords.length; i++) {
 			// this checks the bounds of the board and that the current blocks are not overlapping with existing ones
-			if (pieceCoords[i][0] >= this.rows || pieceCoords[i][0] < 0 || pieceCoords[i][1] < 0 || pieceCoords[i][1] >= this.cols || this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] === 1) {
+			if (pieceCoords[i][0] >= this.rows || pieceCoords[i][0] < 0 || pieceCoords[i][1] < 0 || pieceCoords[i][1] >= this.cols || this.gameBoard[pieceCoords[i][0]][pieceCoords[i][1]] > 0) {
 				flag = false;
 			}
 		}
 		for (let i = 0; i < this.activePiece.length; i++) {
-			this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1;
+			this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1 * this.activeColor;
 		}
 		return flag;
 	}
@@ -155,7 +160,7 @@ class Game {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
 			}
 			for (let i = 0; i < this.activePiece.length; i++) {
-				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1] - 1] = 1;
+				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1] - 1] = 1 * this.activeColor;
 				this.activePiece[i][1]--;
 			}
 		}
@@ -170,7 +175,7 @@ class Game {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
 			}
 			for (let i = 0; i < this.activePiece.length; i++) {
-				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1] + 1] = 1;
+				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1] + 1] = 1 * this.activeColor;
 				this.activePiece[i][1]++;
 			}
 		}
@@ -189,7 +194,7 @@ class Game {
 			let isRowFull = this.gameBoard[i].reduce((accumulator, currentValue) => {
 				return accumulator * currentValue;
 			}, 1);
-			if (isRowFull === 1) {
+			if (isRowFull > 0) {
 				this.gameBoard[i] = this.gameBoard[i].map(x => x = 0);
 				this.shiftBoardDown(i);
 			} else {
@@ -211,7 +216,7 @@ class Game {
 
 	generatePieceOutline() {
 		for (let i = 0; i < this.shadowPiece.length; i++) {
-			if (this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] !== 1) {
+			if (this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] <= 0) {
 				this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = 0;
 			}
 		}
@@ -220,7 +225,7 @@ class Game {
 			//console.log("slamming shadow!");
 		}
 		for (let i = 0; i < this.shadowPiece.length; i++) {
-			if (this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] !== 1) {
+			if (this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] <= 0) {
 				this.gameBoard[this.shadowPiece[i][0]][this.shadowPiece[i][1]] = -1;
 			}
 		}
@@ -238,7 +243,7 @@ class Game {
 		}
 		let pieceMatrix = Array.from(Array(maxRow - minRow + 1), () => new Array(maxCol - minCol + 1).fill(0));
 		for (let i = 0; i < this.activePiece.length; i++) {
-			pieceMatrix[this.activePiece[i][0] - minRow][this.activePiece[i][1] - minCol] = 1;
+			pieceMatrix[this.activePiece[i][0] - minRow][this.activePiece[i][1] - minCol] = 1 * this.activeColor;
 		}
 		// ok now that our pieceMatrix is filled we can do a little linear algebra trick
 		// to rotate the piece 90 degrees we perform a diagonal flip and then a flip down the vertical
@@ -248,7 +253,7 @@ class Game {
 		let hypotheticalFlip = [];
 		for (let i = 0; i < pieceMatrix.length; i++) {
 			for (let j = 0; j < pieceMatrix[0].length; j++) {
-				if (pieceMatrix[i][j] == 1) {
+				if (pieceMatrix[i][j] > 0) {
 					// The -1 on the column is important, it gets rid of an artifact from the rotation
 					// (a translation over to the right by +1) I am honestly not sure why this happens
 					hypotheticalFlip.push([i + minRow, j + minCol]);
@@ -261,7 +266,7 @@ class Game {
 			}
 			this.activePiece = hypotheticalFlip;
 			for (let i = 0; i < this.activePiece.length; i++) {
-				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1;
+				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1 * this.activeColor;
 			}
 		}
 	}
