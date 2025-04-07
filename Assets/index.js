@@ -15,6 +15,12 @@ function main() {
 		userGame.exertGravityOnBoard();
 		blitScreen(userGame.gameBoard);
 	});
+	setInterval(function() {
+		userGame.generatePieceOutline();
+		userGame.exertGravityOnBoard();
+		blitScreen(userGame.gameBoard);
+	}, 1000);
+
 	document.addEventListener('keydown', (event) => {
 		console.log(event.code);
 		if (event.code === "ArrowLeft") {
@@ -75,3 +81,4 @@ function blitScreen(board) {
 
 
 main();
+

@@ -272,7 +272,7 @@ class Game {
 	}
 
 	randomlyChoosePiece() {
-		let tetriminos = [tetriminoModule.TTetrimino, tetriminoModule.LReverseTetrimino, tetriminoModule.LTetrimino, tetriminoModule.ITetrimino];
+		let tetriminos = [tetriminoModule.TTetrimino, tetriminoModule.LReverseTetrimino, tetriminoModule.LTetrimino, tetriminoModule.ITetrimino, tetriminoModule.STetrimino, tetriminoModule.ZTetrimino, tetriminoModule.OTetrimino];
 		let min = Math.ceil(0);
 		let max = Math.floor(tetriminos.length);
 		let randomNumber = Math.floor(Math.random() * (max - min) + min);
