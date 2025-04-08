@@ -98,11 +98,15 @@ function blitScreen(board) {
 			} else if (board[i][j] === 2) {
 				block.style.backgroundColor = 'hsl(245, 100%, 50%)';
 			} else if (board[i][j] === 3) {
-				block.style.backgroundColor = 'hsl(120, 100%, 50%)';
+				block.style.backgroundColor = 'hsl(280, 100%, 50%)';
 			} else if (board[i][j] === 4) {
-				block.style.backgroundColor = 'hsl(50, 100%, 50%)';
+				block.style.backgroundColor = 'hsl(20, 100%, 50%)';
 			} else if (board[i][j] === 5) {
 				block.style.backgroundColor = 'hsl(320, 100%, 50%)';
+			} else if (board[i][j] === 6) {
+				block.style.backgroundColor = 'hsl(210, 100%, 50%)';
+			} else if (board[i][j] === 7) {
+				block.style.backgroundColor = 'hsl(90, 100%, 30%)';
 			} else if (board[i][j] === -1) {
 				block.style.backgroundColor = 'hsl(0, 100%, 5%)';
 			} else {

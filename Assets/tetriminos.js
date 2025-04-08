@@ -6,31 +6,31 @@ export let LTetrimino = [
 ];
 
 export let TTetrimino = [
-	[0, 1, 0],
-	[1, 1, 1]
+	[0, 2, 0],
+	[2, 2, 2]
 ];
 
 export let LReverseTetrimino = [
-	[0, 1],
-	[0, 1],
-	[1, 1]
+	[0, 3],
+	[0, 3],
+	[3, 3]
 ];
 
 export let ITetrimino = [
-	[1, 1, 1, 1]
+	[4, 4, 4, 4]
 ];
 
 export let OTetrimino = [
-	[1, 1],
-	[1, 1]
+	[5, 5],
+	[5, 5]
 ];
 
 export let STetrimino = [
-	[0, 1, 1],
-	[1, 1, 0]
+	[0, 6, 6],
+	[6, 6, 0]
 ];
 
 export let ZTetrimino = [
-	[1, 1, 0],
-	[0, 1, 1]
+	[7, 7, 0],
+	[0, 7, 7]
 ];

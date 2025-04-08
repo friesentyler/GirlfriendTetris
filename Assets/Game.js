@@ -6,8 +6,8 @@ class Game {
 		this.rows = 20;
 		this.cols = 10;
 		this.gameBoard = this.generateGameboard(20, 10);
-		this.activePiece = [];
 		this.activeColor = 1;
+		this.activePiece = [];
 		this.shadowPiece = [];
 	}
 
@@ -17,15 +17,12 @@ class Game {
 
 	addPieceToBoard() {
 		let piece = this.randomlyChoosePiece();
-		let color = Math.floor(Math.random() * 5) + 1;
-		this.activeColor = color;
 		this.activePiece = [];
 		for (let col = 3; col < piece[0].length + 3; col++) {
 			for (let row = 0; row < piece.length; row++) {
-				// we multiply by color so that the blit function knows the color based on the 
-				// integer we randomly assign to the piece
-				this.gameBoard[row][col] = piece[row][col - 3] * this.activeColor;
+				this.gameBoard[row][col] = piece[row][col - 3];
 				if (this.gameBoard[row][col] > 0) {
+					this.activeColor = this.gameBoard[row][col];
 					this.activePiece.push([row, col]);
 				}
 			}
