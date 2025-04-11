@@ -15,11 +15,7 @@ function main() {
 		userGame.exertGravityOnBoard();
 		blitScreen(userGame.gameBoard);
 	});
-	setInterval(function() {
-		userGame.generatePieceOutline();
-		userGame.exertGravityOnBoard();
-		blitScreen(userGame.gameBoard);
-	}, 1000);
+	let gravityTick = setInterval(() => gravity(userGame), 500);
 
 	document.addEventListener('touchstart', function(event) {
 		touchstartX = event.changedTouches[0].screenX;
@@ -32,13 +28,22 @@ function main() {
 		handleGesture();
 	}, false);
 
+	// This method I don't think is gonna work, it just reduces the freq of touch move events
+	// but doesn't actually force the piece to track the finger's movement. We need to somehow get the piece's
+	// position to track the finger movement
+	document.addEventListener('touchmove', function(event) {
+		if (timerTouchFlag) {
+			horizontalSwipeHandler(event, userGame);
+		}
+	}, false);
+
 	function handleGesture() {
 		let xDirection = touchendX - touchstartX;
 		let yDirection = touchendY - touchstartY;
 		console.log(xDirection, yDirection);
 		if (Math.abs(xDirection) >= Math.abs(yDirection)) {
 
-			if (touchendX < touchstartX) {
+			/*if (touchendX < touchstartX) {
 				userGame.movePieceLeft();
 				userGame.generatePieceOutline();
 				blitScreen(userGame.gameBoard);
@@ -46,7 +51,7 @@ function main() {
 				userGame.movePieceRight();
 				userGame.generatePieceOutline();
 				blitScreen(userGame.gameBoard);
-			}
+			}*/
 		} else if (Math.abs(xDirection) < Math.abs(yDirection)) {
 			if (touchendY < touchstartY) {
 				console.log('swipe up');
@@ -85,6 +90,11 @@ function main() {
 			userGame.rotatePiece();
 			userGame.generatePieceOutline();
 			blitScreen(userGame.gameBoard);
+		} else if (event.code === "ArrowDown") {
+			event.preventDefault();
+			userGame.generatePieceOutline();
+			userGame.exertGravityOnBoard();
+			blitScreen(userGame.gameBoard);	// add code to speed up the falling here
 		}
 	});
 }
@@ -116,6 +126,26 @@ function blitScreen(board) {
 	}
 }
 
+function gravity(userGame) {
+	userGame.generatePieceOutline();
+	userGame.exertGravityOnBoard();
+	blitScreen(userGame.gameBoard);
+}
+
+function horizontalSwipeHandler(event, userGame) {
+	timerTouchFlag = false;
+	if (event.changedTouches[0].screenX < touchstartX) {
+		userGame.movePieceLeft();
+		userGame.generatePieceOutline();
+		blitScreen(userGame.gameBoard);
+	} else if (event.changedTouches[0].screenX > touchstartX) {
+		userGame.movePieceRight();
+		userGame.generatePieceOutline();
+		blitScreen(userGame.gameBoard);
+	}
+	setTimeout(() => timerTouchFlag = true, 70);
+}
+
 // first off I should make something that represents just the tetris logic by itself
 // then I need separate logic for blitting the game to the html screen
 
@@ -129,6 +159,7 @@ var touchstartX = 0;
 var touchstartY = 0;
 var touchendX = 0;
 var touchendY = 0;
+var timerTouchFlag = true;
 
 main();
 
