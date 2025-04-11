@@ -15,16 +15,24 @@ function main() {
 		userGame.exertGravityOnBoard();
 		blitScreen(userGame.gameBoard);
 	});
-	let gravityTick = setInterval(() => gravity(userGame), 500);
+	var gravityTick = setInterval(() => gravity(userGame), 500);
 
 	document.addEventListener('touchstart', function(event) {
+		touchStartTime = Date.now();
 		event.preventDefault();
 		touchstartX = event.changedTouches[0].screenX;
 		touchstartY = event.changedTouches[0].screenY;
 		lastTouchX = event.changedTouches[0].screenX;
+		isSpeedUpEnabled = true;
+		console.log("waiting to check if i can speed up");
+		handleSpeedUp();
 	}, false);
 
 	document.addEventListener('touchend', function(event) {
+		touchEndTime = Date.now();
+		console.log("no you can't speed up");
+		isSpeedUpEnabled = false;
+		handleSlowDown();
 		event.preventDefault();
 		touchendX = event.changedTouches[0].screenX;
 		touchendY = event.changedTouches[0].screenY;
@@ -32,6 +40,8 @@ function main() {
 	}, false);
 
 	document.addEventListener('touchmove', function(event) {
+		console.log("no you can't speed up");
+		isSpeedUpEnabled = false;
 		event.preventDefault();
 		let yDirection = event.changedTouches[0].screenY - touchstartY;
 		let xDirection = event.changedTouches[0].screenX - touchstartX;
@@ -50,6 +60,24 @@ function main() {
 		}
 	}, false);
 
+	function handleSpeedUp() {
+		// so this gets triggered when a touch start is fired
+		// if there is no touchmoves fired within a certain duration of time we assume the player
+		// wants to speed up the piece falling
+		// just reset the gravityTick interval to a different duration
+		setTimeout(() => {
+			if (isSpeedUpEnabled) {
+				clearInterval(gravityTick);
+				gravityTick = setInterval(() => gravity(userGame), 100);
+			}
+		}, 500)
+	}
+
+	function handleSlowDown() {
+		clearInterval(gravityTick);
+		gravityTick = setInterval(() => gravity(userGame), 500);
+	}
+
 	function handleGesture() {
 		let xDirection = touchendX - touchstartX;
 		let yDirection = touchendY - touchstartY;
@@ -62,7 +90,7 @@ function main() {
 				blitScreen(userGame.gameBoard);
 			}
 		}
-		if (touchendY === touchstartY) {
+		if (touchendY === touchstartY && touchEndTime - touchStartTime < 100) {
 			userGame.rotatePiece();
 			userGame.generatePieceOutline();
 			blitScreen(userGame.gameBoard);
@@ -147,6 +175,9 @@ var touchstartY = 0;
 var touchendX = 0;
 var touchendY = 0;
 var lastTouchX = 0;
+var isSpeedUpEnabled = false;
+var touchStartTime = 0;
+var touchEndTime = 0;
 
 main();
 
