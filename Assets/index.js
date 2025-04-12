@@ -15,7 +15,7 @@ function main() {
 		userGame.exertGravityOnBoard();
 		blitScreen(userGame.gameBoard);
 	});
-	var gravityTick = setInterval(() => gravity(userGame), 500);
+	var gravityTick = setInterval(() => gravity(userGame), 250);
 
 	document.addEventListener('touchstart', function(event) {
 		touchStartTime = Date.now();
@@ -75,7 +75,7 @@ function main() {
 
 	function handleSlowDown() {
 		clearInterval(gravityTick);
-		gravityTick = setInterval(() => gravity(userGame), 500);
+		gravityTick = setInterval(() => gravity(userGame), 250);
 	}
 
 	function handleGesture() {
