@@ -24,13 +24,11 @@ function main() {
 		touchstartY = event.changedTouches[0].screenY;
 		lastTouchX = event.changedTouches[0].screenX;
 		isSpeedUpEnabled = true;
-		console.log("waiting to check if i can speed up");
 		handleSpeedUp();
 	}, false);
 
 	document.addEventListener('touchend', function(event) {
 		touchEndTime = Date.now();
-		console.log("no you can't speed up");
 		isSpeedUpEnabled = false;
 		handleSlowDown();
 		event.preventDefault();
@@ -40,7 +38,6 @@ function main() {
 	}, false);
 
 	document.addEventListener('touchmove', function(event) {
-		console.log("no you can't speed up");
 		isSpeedUpEnabled = false;
 		event.preventDefault();
 		let yDirection = event.changedTouches[0].screenY - touchstartY;
@@ -133,7 +130,7 @@ function blitScreen(board) {
 		for (let j = 0; j < board[0].length; j++) {
 			let block = document.getElementById(`${i}-${j}`);
 			if (board[i][j] === 1) {
-				block.style.backgroundColor = 'hsl(0, 100%, 50%)';
+				block.style.backgroundColor = 'hsl(350, 100%, 38%)';
 			} else if (board[i][j] === 2) {
 				block.style.backgroundColor = 'hsl(245, 100%, 50%)';
 			} else if (board[i][j] === 3) {
