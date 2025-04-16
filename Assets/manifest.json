@@ -1,21 +1,21 @@
 {
   "name": "Girlfriend Tetris",
   "short_name": "Girlfriend Tetris",
-  "start_url": "/",
+  "start_url": "/prod/index.html",
   "display": "standalone",
   "icons": [
     {
-      "src": "/icon-180.png",
+      "src": "/prod/icon-180.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/prod/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/icon-1024.png",
+      "src": "/prod/icon-1024.png",
       "sizes": "1024x1024",
       "type": "image/png"
     }
