@@ -43,7 +43,7 @@ class DeploymentStack(Stack):
             ),
         )
 
-        bucket = s3.Bucket(self, "gamefiles", public_read_access=True, block_public_access=s3.BlockPublicAccess(block_public_acls=False, block_public_policy=False, ignore_public_acls=False, restrict_public_buckets=False), enforce_ssl=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
+        bucket = s3.Bucket(self, "gamefiles", enforce_ssl=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
 
         s3deploy.BucketDeployment(self, "gamefilesDeployed",
             sources=[s3deploy.Source.asset("../Assets")],
