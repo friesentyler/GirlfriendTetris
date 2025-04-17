@@ -52,7 +52,7 @@ class DeploymentStack(Stack):
         # non binary media types listed here. This allows us to properly serve our images and text content
         rest_api = apigateway.RestApi(self, "game-api",
             binary_media_types=["image/png", "text/css", "application/javascript", "text/html", "image/*", "application/octet-stream", "application/json"],
-            deploy_options=apigateway.StageOptions(throttling_burst_limit=8, throttling_rate_limit=1)
+            deploy_options=apigateway.StageOptions(throttling_burst_limit=10, throttling_rate_limit=10)
         )
         proxy_resource = rest_api.root.add_resource("{proxy+}")
 
