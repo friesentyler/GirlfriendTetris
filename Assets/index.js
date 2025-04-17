@@ -11,8 +11,10 @@ function main() {
 	blitScreen(userGame.gameBoard);
 	let reset = document.querySelector('.reset-button');
 	reset.addEventListener('click', (event) => {
-		userGame.generatePieceOutline();
-		userGame.exertGravityOnBoard();
+		userGame.gameBoard = userGame.generateGameboard(20, 10);
+		userGame.activePiece = [];
+		userGame.addPieceToBoard();
+		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		blitScreen(userGame.gameBoard);
 	});
 	var gravityTick = setInterval(() => gravity(userGame), 250);
