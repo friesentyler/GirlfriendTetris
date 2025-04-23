@@ -52,6 +52,7 @@ h1 {
 	padding: 0;
 	padding-right: 6px;
 	cursor: pointer;
+	flex: 1;
 }
 
 .toggle-play-button {
@@ -61,18 +62,22 @@ h1 {
 	padding: 0;
 	cursor: pointer;
 	padding-right: 6px;
+	flex: 1;
 }
 
 .play-front {
 	display: block;
 	border: 5px solid black;
 	font-weight: bold;
-	padding: 12px 22px;
+	padding: 6px 11px;
 	border-radius: 12px;
 	font-size: 1.25rem;
 	color: black;
 	background-color: #FD9745;
 	transform: translateY(-6px);
+	/* These are new, this is how I get the span to fill the button div */
+	height: 100%;
+	width: 100%;
 }
 
 .reset-front {
@@ -197,4 +202,22 @@ ul {
 		margin-top: 30px;
 	}
 
+	.play-front>img {
+		width: 18%;
+		height: 100%;
+	}
+
+}
+
+/* these prevent chrome from highlighting any of the buttons after clicking them, this only happens in chrome, not safari */
+button:focus {
+	outline: none;
+}
+
+button::-moz-focus-inner {
+	border: 0;
+}
+
+button {
+	-webkit-tap-highlight-color: transparent;
 }

@@ -10,13 +10,15 @@ function main() {
 	userGame.addPieceToBoard();
 	blitScreen(userGame.gameBoard);
 	let reset = document.querySelector('.reset-button');
-	reset.addEventListener('click', (event) => {
+	function resetClicked(event) {
 		userGame.gameBoard = userGame.generateGameboard(20, 10);
 		userGame.activePiece = [];
 		userGame.addPieceToBoard();
 		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		blitScreen(userGame.gameBoard);
-	});
+	}
+	reset.addEventListener('touchstart', resetClicked);
+	reset.addEventListener('click', resetClicked);
 	var gravityTick = setInterval(() => gravity(userGame), 250);
 
 	document.addEventListener('touchstart', function(event) {
@@ -36,7 +38,11 @@ function main() {
 		event.preventDefault();
 		touchendX = event.changedTouches[0].screenX;
 		touchendY = event.changedTouches[0].screenY;
-		handleGesture();
+		console.log(event.target.getAttribute("class"));
+		if (event.target.getAttribute("class") !== "reset-button" && event.target.getAttribute("class") !== "reset-front") {
+			console.log("here")
+			handleGesture();
+		}
 	}, false);
 
 	document.addEventListener('touchmove', function(event) {
