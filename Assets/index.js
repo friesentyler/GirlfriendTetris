@@ -9,6 +9,7 @@ function main() {
 	console.log(userGame.gameBoard);
 	userGame.addPieceToBoard();
 	blitScreen(userGame.gameBoard);
+
 	let reset = document.querySelector('.reset-button');
 	function resetClicked(event) {
 		userGame.gameBoard = userGame.generateGameboard(20, 10);
@@ -17,8 +18,24 @@ function main() {
 		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		blitScreen(userGame.gameBoard);
 	}
+
+	let pausePlay = document.querySelector('.play-front');
+	function togglePlayButton(event) {
+		if (pausePlay.lastElementChild.style.display === "none") {
+			pausePlay.firstElementChild.style.display = "none";
+			pausePlay.lastElementChild.style.display = "initial";
+		} else if (pausePlay.firstElementChild.style.display === "none") {
+			pausePlay.firstElementChild.style.display = "initial";
+			pausePlay.lastElementChild.style.display = "none";
+		}
+	}
+
 	reset.addEventListener('touchstart', resetClicked);
 	reset.addEventListener('click', resetClicked);
+
+	pausePlay.addEventListener('touchstart', togglePlayButton);
+	pausePlay.addEventListener('click', togglePlayButton);
+
 	var gravityTick = setInterval(() => gravity(userGame), 250);
 
 	document.addEventListener('touchstart', function(event) {
@@ -38,9 +55,7 @@ function main() {
 		event.preventDefault();
 		touchendX = event.changedTouches[0].screenX;
 		touchendY = event.changedTouches[0].screenY;
-		console.log(event.target.getAttribute("class"));
-		if (event.target.getAttribute("class") !== "reset-button" && event.target.getAttribute("class") !== "reset-front") {
-			console.log("here")
+		if (event.target.getAttribute("class") !== "reset-button" && event.target.getAttribute("class") !== "reset-front" && event.target.getAttribute("class") !== "toggle-play-button" && event.target.getAttribute("class") !== "play-front") {
 			handleGesture();
 		}
 	}, false);
