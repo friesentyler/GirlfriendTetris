@@ -172,7 +172,6 @@ function handleComputerArrows(event, userGame) {
 }
 
 function xClicked(event, userGame) {
-	console.log("fired");
 	let pauseMenu = document.querySelector('.pause-menu-modal');
 	let pausePlay = document.querySelector('.play-front');
 	pauseMenu.style.display = "none";
@@ -199,7 +198,7 @@ function pauseGame(userGame) {
 	pauseMenu.style.display = "initial";
 	let xButton = document.querySelector('.x-button');
 	xClickedListener = (event) => xClicked(event, userGame);
-	xButton.addEventListener('touchstart', xClickedListener);
+	xButton.addEventListener('touchend', xClickedListener);
 	xButton.addEventListener('click', xClickedListener);
 }
 
@@ -225,7 +224,7 @@ function playGame(userGame) {
 
 	// remove the x button listeners
 	let xButton = document.querySelector('.x-button');
-	xButton.removeEventListener('touchstart', xClickedListener);
+	xButton.removeEventListener('touchend', xClickedListener);
 	xButton.removeEventListener('click', xClickedListener);
 }
 
