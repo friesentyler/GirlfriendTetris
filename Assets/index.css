@@ -45,13 +45,42 @@ h1 {
 	justify-content: space-evenly;
 }
 
-.reset-button {
+.x-row-flex-container {
+	display: flex;
+	justify-content: right;
+}
+
+.scores-column-flex-container {
+	display: flex;
+	padding: 20px;
+	gap: 12px;
+	flex-direction: column;
+}
+
+.highscore-box {
+	display: flex;
+	justify-content: space-between;
+	flex: 1;
+	border-radius: 12px;
+	border: 5px solid black;
+	box-shadow: 5px 5px black;
+	background-color: #FFF4E0;
+	font-size: 2rem;
+	font-weight: bold;
+	padding: 20px;
+}
+
+.reset-button,
+.x-button {
 	background: black;
 	border-radius: 12px;
 	border: none;
 	padding: 0;
 	padding-right: 6px;
 	cursor: pointer;
+}
+
+.reset-button {
 	flex: 1;
 }
 
@@ -80,7 +109,8 @@ h1 {
 	width: 100%;
 }
 
-.reset-front {
+.reset-front,
+.x-front {
 	display: block;
 	padding: 12px 22px;
 	border: 5px solid black;
@@ -93,8 +123,17 @@ h1 {
 
 }
 
+.x-front {
+	border: 5px solid black;
+	border-radius: 12px;
+	font-size: 2.25rem;
+	padding: 12px 32px;
+	background-color: #FF3535;
+}
+
 .toggle-play-button:active .play-front,
-.reset-button:active .reset-front {
+.reset-button:active .reset-front,
+.x-button:active .x-front {
 	transform: translateY(-2px);
 	transform: translateX(3px);
 }
@@ -137,6 +176,27 @@ ul {
 	gap: 15px;
 }
 
+.pause-menu-modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: hsla(0, 0%, 0%, 0.6);
+}
+
+.pause-menu {
+	background-color: #FD9745;
+	margin: 5% auto;
+	padding: 20px;
+	border: 5px solid black;
+	box-shadow: 5px 5px black;
+	border-radius: 12px;
+	width: 35%;
+}
+
 /* I was fighting a loosing 
 * battle with the css, so
 * I opted to just use a media
@@ -159,14 +219,46 @@ ul {
 		user-select: none;
 	}
 
+	.pause-menu {
+		margin: 25% auto;
+		border: 15px solid black;
+		box-shadow: 20px 20px black;
+		width: 85%;
+	}
+
 	.toggle-play-button,
 	.reset-button {
 		padding-right: 12px;
 		padding-bottom: 6px;
 	}
 
+	.scores-column-flex-container {
+		gap: 40px;
+		padding: 40px;
+	}
+
+	.highscore-box {
+		border: 12px solid black;
+		box-shadow: 10px 10px black;
+		font-size: 5rem;
+		padding: 20px;
+	}
+
+	.x-button {
+		padding-right: 18px;
+		padding-bottom: 12px;
+	}
+
+	.x-front {
+		border-radius: 20px;
+		font-size: 6rem;
+		border: 10px solid black;
+		padding: 20px 50px;
+	}
+
 	.reset-front,
-	.play-front {
+	.play-front,
+	.x-button {
 		font-size: 4rem;
 		border-width: 10px;
 		border-radius: 15px;
@@ -176,6 +268,11 @@ ul {
 	.reset-button:active .reset-front {
 		transform: translateY(-4px);
 		transform: translateX(4px);
+	}
+
+	.x-button:active .x-front {
+		transform: translateY(-8px);
+		transform: translateX(8px);
 	}
 
 	.score-section {

@@ -91,20 +91,19 @@ function handleGesture(userGame) {
 
 function togglePlayButton(event, userGame) {
 	let pausePlay = document.querySelector('.play-front');
-	console.log(`play button ${pausePlay.firstElementChild.style.display}`);
 	if (pausePlay.lastElementChild.style.display === "none") {
 		// for pausing
 		pausePlay.firstElementChild.style.display = "none";
 		pausePlay.lastElementChild.style.display = "initial";
-		console.log("pause game");
 		pauseGame(userGame);
-	} else if (pausePlay.firstElementChild.style.display === "none") {
+	}
+	/*else if (pausePlay.firstElementChild.style.display === "none") {
 		// for playing
 		pausePlay.firstElementChild.style.display = "initial";
 		pausePlay.lastElementChild.style.display = "none";
 		console.log("play game");
 		playGame(userGame);
-	}
+	}*/
 }
 
 function handleTouchStart(event, userGame) {
@@ -114,7 +113,7 @@ function handleTouchStart(event, userGame) {
 	touchstartY = event.changedTouches[0].screenY;
 	lastTouchX = event.changedTouches[0].screenX;
 	isSpeedUpEnabled = true;
-	handleSpeedUp();
+	handleSpeedUp(userGame);
 }
 
 function handleTouchEnd(event, userGame) {
@@ -124,7 +123,7 @@ function handleTouchEnd(event, userGame) {
 	event.preventDefault();
 	touchendX = event.changedTouches[0].screenX;
 	touchendY = event.changedTouches[0].screenY;
-	if (event.target.getAttribute("class") !== "reset-button" && event.target.getAttribute("class") !== "reset-front" && event.target.getAttribute("class") !== "toggle-play-button" && event.target.getAttribute("class") !== "play-front") {
+	if (event.target.getAttribute("class") !== "reset-button" && event.target.getAttribute("class") !== "reset-front" && event.target.getAttribute("class") !== "toggle-play-button" && event.target.getAttribute("class") !== "play-front" && event.target.getAttribute("class") !== "x-button" && event.target.getAttribute("class") !== "x-front") {
 		handleGesture(userGame);
 	}
 }
@@ -179,6 +178,16 @@ function handleComputerArrows(event, userGame) {
 	}
 }
 
+function xClicked(event, userGame) {
+	console.log("fired");
+	let pauseMenu = document.querySelector('.pause-menu-modal');
+	let pausePlay = document.querySelector('.play-front');
+	pauseMenu.style.display = "none";
+	pausePlay.firstElementChild.style.display = "initial";
+	pausePlay.lastElementChild.style.display = "none";
+	playGame(userGame);
+}
+
 function pauseGame(userGame) {
 	let reset = document.querySelector('.reset-button');
 	let newReset = reset.cloneNode(true);
@@ -195,6 +204,14 @@ function pauseGame(userGame) {
 	document.removeEventListener('touchend', touchEndListener, false);
 	document.removeEventListener('touchmove', touchMoveListener, false);
 	document.removeEventListener('keydown', keyDownListener);
+
+	// display the pause menu
+	let pauseMenu = document.querySelector('.pause-menu-modal');
+	pauseMenu.style.display = "initial";
+	let xButton = document.querySelector('.x-button');
+	xClickedListener = (event) => xClicked(event, userGame);
+	xButton.addEventListener('touchstart', xClickedListener);
+	xButton.addEventListener('click', xClickedListener);
 }
 
 function playGame(userGame) {
@@ -214,13 +231,17 @@ function playGame(userGame) {
 	/*let pausePlay = document.querySelector('.play-front');
 	pausePlay.addEventListener('touchstart', (event) => togglePlayButton(event, userGame));
 	pausePlay.addEventListener('click', (event) => togglePlayButton(event, userGame));*/
-
 	gravityTick = setInterval(() => gravity(userGame), 250);
 
 	document.addEventListener('touchstart', touchStartListener = (event) => handleTouchStart(event, userGame), false);
 	document.addEventListener('touchend', touchEndListener = (event) => handleTouchEnd(event, userGame), false);
 	document.addEventListener('touchmove', touchMoveListener = (event) => handleTouchMove(event, userGame), false);
 	document.addEventListener('keydown', keyDownListener = (event) => handleComputerArrows(event, userGame));
+
+	// remove the x button listeners
+	let xButton = document.querySelector('.x-button');
+	xButton.removeEventListener('touchstart', xClickedListener);
+	xButton.removeEventListener('click', xClickedListener);
 }
 
 // first off I should make something that represents just the tetris logic by itself
@@ -238,6 +259,7 @@ var touchStartListener = null;
 var touchEndListener = null;
 var touchMoveListener = null;
 var keyDownListener = null;
+var xClickedListener = null;
 
 var touchstartX = 0;
 var touchstartY = 0;
