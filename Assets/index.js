@@ -97,13 +97,6 @@ function togglePlayButton(event, userGame) {
 		pausePlay.lastElementChild.style.display = "initial";
 		pauseGame(userGame);
 	}
-	/*else if (pausePlay.firstElementChild.style.display === "none") {
-		// for playing
-		pausePlay.firstElementChild.style.display = "initial";
-		pausePlay.lastElementChild.style.display = "none";
-		console.log("play game");
-		playGame(userGame);
-	}*/
 }
 
 function handleTouchStart(event, userGame) {
@@ -192,10 +185,6 @@ function pauseGame(userGame) {
 	let reset = document.querySelector('.reset-button');
 	let newReset = reset.cloneNode(true);
 	reset.parentNode.replaceChild(newReset, reset);
-	// if this isn't commented there's no way to unpause the game
-	/*let pausePlay = document.querySelector('.play-front');
-	let newPausePlay = pausePlay.cloneNode(true);
-	pausePlay.parentNode.replaceChild(newPausePlay, pausePlay);*/
 
 	clearInterval(gravityTick);
 	// notice that the functions we remove on these events are named arrow functions, the names are global
@@ -227,10 +216,6 @@ function playGame(userGame) {
 	reset.addEventListener('touchstart', (event) => resetClicked(event, userGame));
 	reset.addEventListener('click', (event) => resetClicked(event, userGame));
 
-	// THE CODE FOR ADDING THESE LISTENERS IS IN THE MAIN(), PROBABLY WILL REMOVE THIS AT SOME POINT?
-	/*let pausePlay = document.querySelector('.play-front');
-	pausePlay.addEventListener('touchstart', (event) => togglePlayButton(event, userGame));
-	pausePlay.addEventListener('click', (event) => togglePlayButton(event, userGame));*/
 	gravityTick = setInterval(() => gravity(userGame), 250);
 
 	document.addEventListener('touchstart', touchStartListener = (event) => handleTouchStart(event, userGame), false);
