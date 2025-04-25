@@ -18,15 +18,34 @@ class Game {
 	addPieceToBoard() {
 		let piece = this.randomlyChoosePiece();
 		this.activePiece = [];
+		if (!this.isGameOver(piece)) {
+			for (let col = 3; col < piece[0].length + 3; col++) {
+				for (let row = 0; row < piece.length; row++) {
+					this.gameBoard[row][col] = piece[row][col - 3];
+					if (this.gameBoard[row][col] > 0) {
+						this.activeColor = this.gameBoard[row][col];
+						this.activePiece.push([row, col]);
+					}
+				}
+			}
+		} else {
+			this.gameBoard = this.generateGameboard(20, 10);
+			this.activePiece = [];
+			this.addPieceToBoard();
+			// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
+		}
+	}
+
+	isGameOver(piece) {
+		let gameOver = false;
 		for (let col = 3; col < piece[0].length + 3; col++) {
 			for (let row = 0; row < piece.length; row++) {
-				this.gameBoard[row][col] = piece[row][col - 3];
-				if (this.gameBoard[row][col] > 0) {
-					this.activeColor = this.gameBoard[row][col];
-					this.activePiece.push([row, col]);
+				if (this.gameBoard[row][col] > 0 && piece[row][col - 3] !== 0) {
+					gameOver = true;
 				}
 			}
 		}
+		return gameOver;
 	}
 
 	exertGravityOnBoard() {
