@@ -82,7 +82,7 @@ function handleGesture(userGame) {
 			blitScreen(userGame.gameBoard);
 		}
 	}
-	if (touchendY === touchstartY && touchEndTime - touchStartTime < 100) {
+	if (touchendY === touchstartY && touchEndTime - touchStartTime < 120) {
 		userGame.rotatePiece();
 		userGame.generatePieceOutline();
 		blitScreen(userGame.gameBoard);
@@ -110,6 +110,15 @@ function handleTouchStart(event, userGame) {
 }
 
 function handleTouchEnd(event, userGame) {
+	// had to put this in here because there was a bug that if you rotate the piece too fast it stops
+	// falling entirely, so we keep track of the time between touchEnds to call gravity()
+	if (Date.now() - touchEndTime < 250) {
+		accumulatedTimeBetweenTouchEnds += (Date.now() - touchEndTime)
+		if (accumulatedTimeBetweenTouchEnds > 250) {
+			accumulatedTimeBetweenTouchEnds = 0;
+			gravity(userGame);
+		}
+	}
 	touchEndTime = Date.now();
 	isSpeedUpEnabled = false;
 	handleSlowDown(userGame);
@@ -254,6 +263,7 @@ var isSpeedUpEnabled = false;
 var touchStartTime = 0;
 var touchEndTime = 0;
 var gravityTick = 0;
+var accumulatedTimeBetweenTouchEnds = 0;
 
 main();
 
