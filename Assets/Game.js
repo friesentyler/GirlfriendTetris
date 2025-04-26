@@ -247,6 +247,16 @@ class Game {
 		}
 	}
 
+	shiftLeftIfOnRightEdge(hypotheticalFlip) {
+		let result = hypotheticalFlip.map(row => row[1]);
+		result = Math.max(...result);
+		if (result > 9) {
+			let shiftLeftBy = Math.abs(result - 9) * -1;
+			hypotheticalFlip = hypotheticalFlip.map(row => [row[0], row[1] + shiftLeftBy])
+		}
+		return hypotheticalFlip;
+	}
+
 	rotatePiece() {
 		// finding coords so that we don't go out of bounds when filling our piece matrix
 		let minRow = Infinity, minCol = Infinity;
@@ -270,12 +280,14 @@ class Game {
 		for (let i = 0; i < pieceMatrix.length; i++) {
 			for (let j = 0; j < pieceMatrix[0].length; j++) {
 				if (pieceMatrix[i][j] > 0) {
-					// The -1 on the column is important, it gets rid of an artifact from the rotation
-					// (a translation over to the right by +1) I am honestly not sure why this happens
 					hypotheticalFlip.push([i + minRow, j + minCol]);
 				}
 			}
 		}
+
+		// this handles the edge case where the piece won't flip if its on the right side of the board
+		hypotheticalFlip = this.shiftLeftIfOnRightEdge(hypotheticalFlip);
+
 		if (this.validFlip(hypotheticalFlip)) {
 			for (let i = 0; i < this.activePiece.length; i++) {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
