@@ -50,6 +50,8 @@ function gravity(userGame) {
 	userGame.generatePieceOutline();
 	let isNewPieceGenerated = userGame.exertGravityOnBoard();
 	if (isNewPieceGenerated === 1) {
+		userGame.clearLines();
+		userGame.addPieceToBoard();
 		handleSlowDown(userGame);
 	}
 	blitScreen(userGame.gameBoard);

@@ -67,10 +67,13 @@ class Game {
 				this.activePiece[i][0]++;
 			}
 		} else {
-			// need to put random piece generation here
+			// ok so here we need to put the logic for allowing the piece to be temporarily rotated
+			// after being set down. I would prefer that there is no timer logic in the 
+			// Game.js to keep it clean. which most likely means moving the clearLines() and
+			// addPieceToBoard() to a different function
 			console.log("Generate new piece!");
-			this.clearLines();
-			this.addPieceToBoard();
+			//this.clearLines();
+			//this.addPieceToBoard();
 			return 1;
 		}
 	}
