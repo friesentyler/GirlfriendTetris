@@ -1,6 +1,8 @@
 import * as tetriminoModule from './tetriminos.js';
 
 class Game {
+	// we don't want this to be externally accessible, use getTimerLengthFromPieceDrops()
+	#timerLength = 250;
 
 	constructor() {
 		this.rows = 20;
@@ -9,6 +11,7 @@ class Game {
 		this.activeColor = 1;
 		this.activePiece = [];
 		this.shadowPiece = [];
+		this.piecesDropped = 0;
 	}
 
 	generateGameboard(rows, columns) {
@@ -28,10 +31,12 @@ class Game {
 					}
 				}
 			}
+			this.piecesDropped++;
 		} else {
 			this.gameBoard = this.generateGameboard(20, 10);
 			this.activePiece = [];
 			this.addPieceToBoard();
+			this.piecesDropped = 0;
 			// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		}
 	}
@@ -305,6 +310,12 @@ class Game {
 		let max = Math.floor(tetriminos.length);
 		let randomNumber = Math.floor(Math.random() * (max - min) + min);
 		return tetriminos[randomNumber];
+	}
+
+	getTimerLengthFromPieceDrops() {
+		let level = Math.floor(this.piecesDropped / 50);
+		//console.log(`level: ${level} pieces dropped: ${this.piecesDropped} timer length: ${this.#timerLength - (0.1 * this.#timerLength * level)}`);
+		return this.#timerLength - (0.1 * this.#timerLength * level);
 	}
 }
 

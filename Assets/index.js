@@ -48,7 +48,10 @@ function blitScreen(board) {
 
 function gravity(userGame) {
 	userGame.generatePieceOutline();
-	userGame.exertGravityOnBoard();
+	let isNewPieceGenerated = userGame.exertGravityOnBoard();
+	if (isNewPieceGenerated === 1) {
+		handleSlowDown(userGame);
+	}
 	blitScreen(userGame.gameBoard);
 }
 
@@ -67,7 +70,7 @@ function handleSpeedUp(userGame) {
 
 function handleSlowDown(userGame) {
 	clearInterval(gravityTick);
-	gravityTick = setInterval(() => gravity(userGame), 250);
+	gravityTick = setInterval(() => gravity(userGame), userGame.getTimerLengthFromPieceDrops());
 }
 
 function handleGesture(userGame) {
@@ -151,7 +154,7 @@ function handleTouchMove(event, userGame) {
 }
 
 function handleComputerArrows(event, userGame) {
-	console.log(event.code);
+	//console.log(event.code);
 	if (event.code === "ArrowLeft") {
 		event.preventDefault();
 		userGame.movePieceLeft();
@@ -165,6 +168,9 @@ function handleComputerArrows(event, userGame) {
 	} else if (event.code === "Space") {
 		event.preventDefault();
 		userGame.slamPiece();
+		// have to add this so that the timer function gets updated with the new timeout value
+		// when the player advances to the next level
+		handleSlowDown(userGame);
 		userGame.generatePieceOutline();
 		blitScreen(userGame.gameBoard);
 	} else if (event.code === "ArrowUp") {
@@ -174,6 +180,9 @@ function handleComputerArrows(event, userGame) {
 		blitScreen(userGame.gameBoard);
 	} else if (event.code === "ArrowDown") {
 		event.preventDefault();
+		// have to add this so that the timer function gets updated with the new timeout value
+		// when the player advances to the next level
+		handleSlowDown(userGame);
 		userGame.generatePieceOutline();
 		userGame.exertGravityOnBoard();
 		blitScreen(userGame.gameBoard);	// add code to speed up the falling here
@@ -217,6 +226,7 @@ function playGame(userGame) {
 		userGame.gameBoard = userGame.generateGameboard(20, 10);
 		userGame.activePiece = [];
 		userGame.addPieceToBoard();
+		userGame.piecesDropped = 0;
 		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		blitScreen(userGame.gameBoard);
 	}
@@ -224,7 +234,7 @@ function playGame(userGame) {
 	reset.addEventListener('touchstart', (event) => resetClicked(event, userGame));
 	reset.addEventListener('click', (event) => resetClicked(event, userGame));
 
-	gravityTick = setInterval(() => gravity(userGame), 250);
+	gravityTick = setInterval(() => gravity(userGame), userGame.getTimerLengthFromPieceDrops());
 
 	document.addEventListener('touchstart', touchStartListener = (event) => handleTouchStart(event, userGame), false);
 	document.addEventListener('touchend', touchEndListener = (event) => handleTouchEnd(event, userGame), false);
