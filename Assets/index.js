@@ -50,9 +50,19 @@ function gravity(userGame) {
 	userGame.generatePieceOutline();
 	let isNewPieceGenerated = userGame.exertGravityOnBoard();
 	if (isNewPieceGenerated === 1) {
-		userGame.clearLines();
-		userGame.addPieceToBoard();
-		handleSlowDown(userGame);
+		clearInterval(gravityTick);
+		setTimeout(() => {
+			if (userGame.exertGravityOnBoard() === 1) {
+				userGame.clearLines();
+				userGame.addPieceToBoard();
+				timeRemainingForActivePieceToSolidify = 1000;
+				handleSlowDown(userGame);
+			} else {
+				timeRemainingForActivePieceToSolidify -= timeRemainingForActivePieceToSolidify / 4
+				handleSlowDown(userGame);
+			}
+		}, timeRemainingForActivePieceToSolidify)
+
 	}
 	blitScreen(userGame.gameBoard);
 }
@@ -88,7 +98,11 @@ function handleGesture(userGame) {
 		}
 	}
 	if (touchendY === touchstartY && touchEndTime - touchStartTime < 120) {
-		userGame.rotatePiece();
+		// allows the user to rotate a piece before it fully solidifies
+		if (userGame.rotatePiece() === -1) {
+			userGame.shiftActivePieceUpOne();
+			userGame.rotatePiece();
+		}
 		userGame.generatePieceOutline();
 		blitScreen(userGame.gameBoard);
 	}
@@ -177,7 +191,12 @@ function handleComputerArrows(event, userGame) {
 		blitScreen(userGame.gameBoard);
 	} else if (event.code === "ArrowUp") {
 		event.preventDefault();
-		userGame.rotatePiece();
+		// ensures that if the piece has been placed the user gets the opportunity to rotate it 
+		// before it solidifies
+		if (userGame.rotatePiece() === -1) {
+			userGame.shiftActivePieceUpOne();
+			userGame.rotatePiece();
+		}
 		userGame.generatePieceOutline();
 		blitScreen(userGame.gameBoard);
 	} else if (event.code === "ArrowDown") {
@@ -276,6 +295,7 @@ var touchStartTime = 0;
 var touchEndTime = 0;
 var gravityTick = 0;
 var accumulatedTimeBetweenTouchEnds = 0;
+var timeRemainingForActivePieceToSolidify = 1000;
 
 main();
 

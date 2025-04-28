@@ -209,7 +209,8 @@ class Game {
 		while (this.exertGravityOnBoard() !== 1) {
 			//console.log("slamming!");
 		}
-		//this.clearLines();
+		this.clearLines();
+		this.addPieceToBoard();
 	}
 
 	clearLines() {
@@ -304,6 +305,8 @@ class Game {
 			for (let i = 0; i < this.activePiece.length; i++) {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1 * this.activeColor;
 			}
+		} else {
+			return -1;
 		}
 	}
 
@@ -319,6 +322,16 @@ class Game {
 		let level = Math.floor(this.piecesDropped / 50);
 		//console.log(`level: ${level} pieces dropped: ${this.piecesDropped} timer length: ${this.#timerLength - (0.1 * this.#timerLength * level)}`);
 		return this.#timerLength - (0.1 * this.#timerLength * level);
+	}
+
+	shiftActivePieceUpOne() {
+		for (let i = 0; i < this.activePiece.length; i++) {
+			this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 0;
+		}
+		for (let i = 0; i < this.activePiece.length; i++) {
+			this.gameBoard[this.activePiece[i][0] - 1][this.activePiece[i][1]] = 1 * this.activeColor;
+			this.activePiece[i][0]--;
+		}
 	}
 }
 
