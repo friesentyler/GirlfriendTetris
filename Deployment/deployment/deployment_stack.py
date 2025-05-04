@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+
 from aws_cdk import (
     Stack,
     aws_lambda as _lambda,
@@ -5,15 +8,35 @@ from aws_cdk import (
     aws_apigateway as apigateway,
     aws_s3 as s3,
     aws_s3_deployment as s3deploy,
-    aws_iam as iam
+    aws_iam as iam,
+    aws_certificatemanager as acm
 )
 import aws_cdk as cdk
 from constructs import Construct
+
+class CertStack(Stack):
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+
+        cert = acm.Certificate(self, "Certificate",
+            domain_name="www.girlfriendtetris.com",
+            subject_alternative_names=["girlfriendtetris.com"],
+            validation=acm.CertificateValidation.from_dns()
+        )
+
+        CfnOutput(self, "CertificateArn", value=cert.certificate_arn, export_name="CertArn")
+
+
 
 class DeploymentStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        load_dotenv()
+        # this arn is loaded from the .env file. run the CertStack to get the arn which we then set the env to
+        cert_arn = os.getenv("CERTIFICATE_ARN")
+        cert = acm.Certificate.from_certificate_arn(self, "ImportedCert", cert_arn)
 
         # This gives the API Gateway the role necessary to access the S3 public
         # this way we don't need to make the S3 bucket public
@@ -52,7 +75,18 @@ class DeploymentStack(Stack):
         # non binary media types listed here. This allows us to properly serve our images and text content
         rest_api = apigateway.RestApi(self, "game-api",
             binary_media_types=["image/png", "text/css", "application/javascript", "text/html", "image/*", "application/octet-stream", "application/json"],
-            deploy_options=apigateway.StageOptions(throttling_burst_limit=10, throttling_rate_limit=10)
+            deploy_options=apigateway.StageOptions(throttling_burst_limit=10, throttling_rate_limit=10),
+        )
+        # specify the custom domain i.e. girlfriendtetris.com on the API gateway
+        custom_domain = apigateway.DomainName(self, "CustomDomain",
+            # I make it point to a subdomain because IONOS doesn't support apex CNAME records
+            domain_name="www.girlfriendtetris.com",
+            certificate=cert,
+        )
+        apigateway.BasePathMapping(self, "BasePathMapping",
+            domain_name=custom_domain,
+            rest_api=rest_api,
+            stage=rest_api.deployment_stage
         )
         proxy_resource = rest_api.root.add_resource("{proxy+}")
 
@@ -166,6 +200,7 @@ class DeploymentStack(Stack):
         )'''
 
         CfnOutput(self, "Api Gateway", value=rest_api.url)
+        CfnOutput(self, "CustomDomainTarget", value=custom_domain.domain_name_alias_domain_name)
 
 
 

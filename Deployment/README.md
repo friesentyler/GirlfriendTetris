@@ -12,6 +12,21 @@ https://docs.aws.amazon.com/cdk/v2/guide/hello_world.html#hello_world_create
 (although for a quick rundown after that you will need to run `cdk bootstrap` assuming you don't have an already
 existing CDKToolkit stack and then run `cdk synth` then finally `cdk deploy`, to destroy the stack run `cdk destroy`)
 
+You will want to deploy the two stacks separately, one generates the certificate "CertStack" and one provisions the resources
+"DeploymentStack". After deploying CertStack via `cdk deploy CertStack` you will need to update the `CERTIFICATE_ARN` in the .env
+file so that it matches 
+
+but before the deployment finishes you will need to add a CNAME record to IONOS (delete the old one if it exists, do it
+for the apex domain and the www one) manually. While the cdk deploy is still running navigate to ACM in AWS and copy 
+the CNAME name and CNAME value. Go back to IONOS and use these in a new CNAME record. The cdk stack should finish 
+deploying and say that the certificate was issued. However, you will only have to do this once when you initially deploy 
+the CertStack. From then on only deploy the DeploymentStack.
+
+When you run the DeploymentStack it should spit out a custom domain target. We need a CNAME record in ionos with host set to
+"www" with the value set to the output from the DeploymentStack. this should theoretically not change between deployments.
+Also we need a redirect record in IONOS to forward traffic from girlfriendtetris.com to www.girlfriendtetris.com. This is because
+IONOS doesn't support apex CNAME records, so we have a bit of redirection hell.
+
 # Welcome to your CDK Python project!
 
 This is a blank project for CDK development with Python.

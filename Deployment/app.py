@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from deployment.deployment_stack import DeploymentStack
+from deployment.deployment_stack import CertStack, DeploymentStack
 
 
 app = cdk.App()
@@ -24,5 +24,6 @@ DeploymentStack(app, "DeploymentStack",
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
+CertStack(app, "CertStack", env=cdk.Environment(account='456180007659', region='us-west-2'))
 
 app.synth()
