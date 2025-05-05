@@ -49,7 +49,7 @@ class DeploymentStack(Stack):
             ]
         )
 
-        _lambda.Function(self, "Function",
+        get_highscores_lambda = _lambda.Function(self, "GetHighscores",
             runtime=_lambda.Runtime.PYTHON_3_13,
             handler="index.handler",
             code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/GetHighscores"))
@@ -64,6 +64,7 @@ class DeploymentStack(Stack):
             partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
+        high_score_table.grant_read_data(get_highscores_lambda)
 
         bucket = s3.Bucket(self, "gamefiles", enforce_ssl=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
 
@@ -76,7 +77,16 @@ class DeploymentStack(Stack):
         # non binary media types listed here. This allows us to properly serve our images and text content
         rest_api = apigateway.RestApi(self, "game-api",
             binary_media_types=["image/png", "text/css", "application/javascript", "text/html", "image/*", "application/octet-stream", "application/json"],
-            deploy_options=apigateway.StageOptions(throttling_burst_limit=10, throttling_rate_limit=10),
+            deploy_options=apigateway.StageOptions(
+                throttling_burst_limit=10,
+                throttling_rate_limit=10,
+                method_options={
+                    "/highscores/GET": apigateway.MethodDeploymentOptions(
+                        throttling_rate_limit=1,
+                        throttling_burst_limit=3
+                    )
+                }
+            ),
         )
         # specify the custom domain i.e. girlfriendtetris.com on the API gateway
         custom_domain = apigateway.DomainName(self, "CustomDomain",
@@ -180,33 +190,19 @@ class DeploymentStack(Stack):
         ])
 
 
-        '''my_function = _lambda.Function(
-            self, "HelloWorldFunction",
-            runtime = _lambda.Runtime.NODEJS_20_X,
-            handler = "index.handler",
-            code = _lambda.Code.from_inline(
-                """
-                exports.handler = async function(event) {
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify('Hello CDK!'),
-                    };
-                };
-                """
-            ),
+        # Create a dedicated /highscores resource
+        highscores_resource = rest_api.root.add_resource("highscores")
+        highscores_integration = apigateway.LambdaIntegration(get_highscores_lambda)
+        highscores_method = highscores_resource.add_method(
+            "GET",
+            highscores_integration,
+            method_responses=[
+                apigateway.MethodResponse(status_code="200"),
+                apigateway.MethodResponse(status_code="400"),
+                apigateway.MethodResponse(status_code="500"),
+            ]
         )
-
-        my_function_url = my_function.add_function_url(
-            auth_type = _lambda.FunctionUrlAuthType.NONE,
-        )'''
 
         CfnOutput(self, "Api Gateway", value=rest_api.url)
         CfnOutput(self, "CustomDomainTarget", value=custom_domain.domain_name_alias_domain_name)
 
-
-
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "DeploymentQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
