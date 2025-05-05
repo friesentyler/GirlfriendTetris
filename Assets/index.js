@@ -239,6 +239,7 @@ function pauseGame(userGame) {
 	xClickedListener = (event) => xClicked(event, userGame);
 	xButton.addEventListener('touchend', xClickedListener);
 	xButton.addEventListener('click', xClickedListener);
+	getHighscores();
 }
 
 function playGame(userGame) {
@@ -266,6 +267,28 @@ function playGame(userGame) {
 	let xButton = document.querySelector('.x-button');
 	xButton.removeEventListener('touchend', xClickedListener);
 	xButton.removeEventListener('click', xClickedListener);
+}
+
+async function getHighscores() {
+	let result = await fetch('https://www.girlfriendtetris.com/highscores');
+	result = await result.json();
+	// removes all the highscores first
+	let scoresFlex = document.querySelector('.scores-column-flex-container');
+	while (scoresFlex.firstChild) {
+		scoresFlex.removeChild(scoresFlex.firstChild);
+	}
+	// then repopulates the highscores that we retrieved from the DB
+	for (let i = 0; i < result.length; i++) {
+		let scoreBox = document.createElement('div');
+		let playerName = document.createElement('p');
+		let playerScore = document.createElement('p');
+		scoreBox.classList.add('highscore-box');
+		playerName.textContent = result[i].PlayerName;
+		playerScore.textContent = result[i].Score;
+		scoreBox.appendChild(playerName);
+		scoreBox.appendChild(playerScore);
+		scoresFlex.appendChild(scoreBox);
+	}
 }
 
 // first off I should make something that represents just the tetris logic by itself

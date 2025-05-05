@@ -51,16 +51,20 @@ h1 {
 }
 
 .scores-column-flex-container {
+	margin-top: 30px;
 	display: flex;
 	padding: 20px;
 	gap: 12px;
 	flex-direction: column;
+	overflow: auto;
+	scrollbar-width: 5px;
+	scrollbar-color: black;
+	height: 80%;
 }
 
 .highscore-box {
 	display: flex;
 	justify-content: space-between;
-	flex: 1;
 	border-radius: 12px;
 	border: 5px solid black;
 	box-shadow: 5px 5px black;
@@ -195,6 +199,7 @@ ul {
 	box-shadow: 5px 5px black;
 	border-radius: 12px;
 	width: 35%;
+	height: 70vh;
 }
 
 /* I was fighting a loosing 
@@ -317,4 +322,13 @@ button::-moz-focus-inner {
 
 button {
 	-webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+	width: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: black;
+	border-radius: 12px;
 }
