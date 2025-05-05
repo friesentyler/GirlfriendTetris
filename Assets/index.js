@@ -272,6 +272,7 @@ function playGame(userGame) {
 async function getHighscores() {
 	let result = await fetch('https://www.girlfriendtetris.com/highscores');
 	result = await result.json();
+	result.sort((a, b) => b.Score - a.Score);
 	// removes all the highscores first
 	let scoresFlex = document.querySelector('.scores-column-flex-container');
 	while (scoresFlex.firstChild) {
