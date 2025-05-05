@@ -9,7 +9,8 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_s3_deployment as s3deploy,
     aws_iam as iam,
-    aws_certificatemanager as acm
+    aws_certificatemanager as acm,
+    aws_dynamodb as dynamodb
 )
 import aws_cdk as cdk
 from constructs import Construct
@@ -48,20 +49,20 @@ class DeploymentStack(Stack):
             ]
         )
 
-        my_function = _lambda.Function(
-            self, "HelloWorldFunction",
-            runtime = _lambda.Runtime.NODEJS_20_X,
-            handler = "index.handler",
-            code = _lambda.Code.from_inline(
-                """
-                exports.handler = async function(event) {
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify('Hello CDK!'),
-                    };
-                };
-                """
-            ),
+        _lambda.Function(self, "Function",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/GetHighscores"))
+        )
+
+        temp_score_table = dynamodb.TableV2(self, "TempTable",
+            partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
+            removal_policy=cdk.RemovalPolicy.DESTROY
+        )
+
+        high_score_table = dynamodb.TableV2(self, "HighscoreTable",
+            partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
+            removal_policy=cdk.RemovalPolicy.DESTROY
         )
 
         bucket = s3.Bucket(self, "gamefiles", enforce_ssl=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
