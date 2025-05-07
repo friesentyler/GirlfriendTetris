@@ -304,8 +304,27 @@ async function startNewGame() {
 	gameCode = await gameCode.json();
 }
 
-async function endGame() {
+async function endGame(postBody) {
 	// this resets a game session that over (or in progress if the the reset button was clicked)
+	let result = await fetch('https://www.girlfriendtetris.com/highscores')
+	result = await result.json();
+	result.sort((a, b) => Number(b.Score) - Number(a.Score));
+	if (result.length < 100) {
+		// add score since the highscore list is less than 100
+	} else {
+		if (Number(result[99].Score) < postBody.PlayerScore) {
+			// display the highscore form and submit a request to the POST endpoint
+		} else {
+			// delete the gameCode for this game, and don't post, since the score wasn't high enough
+			await fetch('https://www.girlfriendtetris.com/deletegame', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ PlayerId: playerId })
+			});
+		}
+	}
 }
 
 // first off I should make something that represents just the tetris logic by itself

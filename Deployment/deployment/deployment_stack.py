@@ -67,12 +67,19 @@ class DeploymentStack(Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/PostHighscore"))
         )
 
+        delete_game_lambda = _lambda.Function(self, "DeleteGame",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/DeleteGame"))
+        )
+
         temp_score_table = dynamodb.TableV2(self, "TempTable",
             partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
         temp_score_table.grant_full_access(start_game_lambda)
         temp_score_table.grant_full_access(post_highscore_lambda)
+        temp_score_table.grant_full_access(delete_game_lambda)
 
         high_score_table = dynamodb.TableV2(self, "HighscoreTable",
             partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
@@ -107,7 +114,11 @@ class DeploymentStack(Stack):
                     "/posthighscore/POST": apigateway.MethodDeploymentOptions(
                         throttling_rate_limit=1,
                         throttling_burst_limit=2
-                    )
+                    ),
+                    "/deletegame/DELETE": apigateway.MethodDeploymentOptions(
+                        throttling_rate_limit=1,
+                        throttling_burst_limit=2
+                    ),
                 }
             ),
         )
@@ -245,6 +256,19 @@ class DeploymentStack(Stack):
         posthighscore_method = posthighscore_resource.add_method(
             "POST",
             posthighscore_integration,
+            method_responses=[
+                apigateway.MethodResponse(status_code="200"),
+                apigateway.MethodResponse(status_code="400"),
+                apigateway.MethodResponse(status_code="500"),
+            ]
+        )
+
+        # deletes the game code from the temp table, only gets used if a score isn't high enough to make the leaderboard
+        deletegame_resource = rest_api.root.add_resource("deletegame")
+        deletegame_integration = apigateway.LambdaIntegration(delete_game_lambda)
+        deletegame_method = deletegame_resource.add_method(
+            "DELETE",
+            deletegame_integration,
             method_responses=[
                 apigateway.MethodResponse(status_code="200"),
                 apigateway.MethodResponse(status_code="400"),
