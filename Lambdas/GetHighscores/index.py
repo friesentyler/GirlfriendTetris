@@ -3,7 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('DeploymentStack-HighscoreTable1ADCD888-JPBPJIAZT2Z9')
+table = dynamodb.Table('DeploymentStack-HighscoreTable1ADCD888-15CCJ1H268MPA')
 
 def handler(event, context):
     response = table.scan()

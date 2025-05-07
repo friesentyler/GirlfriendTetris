@@ -16,6 +16,7 @@ function main() {
 	pausePlay.addEventListener('click', (event) => togglePlayButton(event, userGame));
 	// END
 
+	startNewGame();
 	playGame(userGame);
 }
 
@@ -54,7 +55,10 @@ function gravity(userGame) {
 		setTimeout(() => {
 			if (userGame.exertGravityOnBoard() === 1) {
 				userGame.clearLines();
-				userGame.addPieceToBoard();
+				if (userGame.addPieceToBoard() === -1) {
+					endGame();
+					startNewGame();
+				}
 				timeRemainingForActivePieceToSolidify = 1000;
 				handleSlowDown(userGame);
 			} else {
@@ -244,12 +248,14 @@ function pauseGame(userGame) {
 
 function playGame(userGame) {
 	let reset = document.querySelector('.reset-button');
-	function resetClicked(event) {
+	async function resetClicked(event) {
 		userGame.gameBoard = userGame.generateGameboard(20, 10);
 		userGame.activePiece = [];
 		userGame.addPieceToBoard();
 		userGame.piecesDropped = 0;
 		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
+		endGame();
+		startNewGame();
 		blitScreen(userGame.gameBoard);
 	}
 
@@ -272,7 +278,7 @@ function playGame(userGame) {
 async function getHighscores() {
 	let result = await fetch('https://www.girlfriendtetris.com/highscores');
 	result = await result.json();
-	result.sort((a, b) => b.Score - a.Score);
+	result.sort((a, b) => Number(b.Score) - Number(a.Score));
 	// removes all the highscores first
 	let scoresFlex = document.querySelector('.scores-column-flex-container');
 	while (scoresFlex.firstChild) {
@@ -290,6 +296,16 @@ async function getHighscores() {
 		scoreBox.appendChild(playerScore);
 		scoresFlex.appendChild(scoreBox);
 	}
+}
+
+async function startNewGame() {
+	// this is the code which is stored in the database that we use to validate the game
+	gameCode = await fetch('https://www.girlfriendtetris.com/startgame');
+	gameCode = await gameCode.json();
+}
+
+async function endGame() {
+	// this resets a game session that over (or in progress if the the reset button was clicked)
 }
 
 // first off I should make something that represents just the tetris logic by itself
@@ -320,6 +336,8 @@ var touchEndTime = 0;
 var gravityTick = 0;
 var accumulatedTimeBetweenTouchEnds = 0;
 var timeRemainingForActivePieceToSolidify = 1000;
+var gameCode = 0;
 
 main();
+
 

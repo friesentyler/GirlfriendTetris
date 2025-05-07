@@ -37,6 +37,7 @@ class Game {
 			this.activePiece = [];
 			this.addPieceToBoard();
 			this.piecesDropped = 0;
+			return -1;
 			// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		}
 	}

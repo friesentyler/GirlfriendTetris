@@ -55,16 +55,31 @@ class DeploymentStack(Stack):
             code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/GetHighscores"))
         )
 
+        start_game_lambda = _lambda.Function(self, "StartGame",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/StartGame"))
+        )
+
+        post_highscore_lambda = _lambda.Function(self, "PostHighscore",
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(os.path.join(os.path.dirname(__file__), "..", "..", "Lambdas/PostHighscore"))
+        )
+
         temp_score_table = dynamodb.TableV2(self, "TempTable",
             partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
+        temp_score_table.grant_full_access(start_game_lambda)
+        temp_score_table.grant_full_access(post_highscore_lambda)
 
         high_score_table = dynamodb.TableV2(self, "HighscoreTable",
             partition_key=dynamodb.Attribute(name="pk", type=dynamodb.AttributeType.STRING),
             removal_policy=cdk.RemovalPolicy.DESTROY
         )
         high_score_table.grant_read_data(get_highscores_lambda)
+        high_score_table.grant_full_access(post_highscore_lambda)
 
         bucket = s3.Bucket(self, "gamefiles", enforce_ssl=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
 
@@ -84,6 +99,14 @@ class DeploymentStack(Stack):
                     "/highscores/GET": apigateway.MethodDeploymentOptions(
                         throttling_rate_limit=1,
                         throttling_burst_limit=3
+                    ),
+                    "/startgame/GET": apigateway.MethodDeploymentOptions(
+                        throttling_rate_limit=1,
+                        throttling_burst_limit=1
+                    ),
+                    "/posthighscore/POST": apigateway.MethodDeploymentOptions(
+                        throttling_rate_limit=1,
+                        throttling_burst_limit=2
                     )
                 }
             ),
@@ -202,6 +225,34 @@ class DeploymentStack(Stack):
                 apigateway.MethodResponse(status_code="500"),
             ]
         )
+
+        # route that gets hit when a user starts a game
+        startgame_resource = rest_api.root.add_resource("startgame")
+        startgame_integration = apigateway.LambdaIntegration(start_game_lambda)
+        startgame_method = startgame_resource.add_method(
+            "GET",
+            startgame_integration,
+            method_responses=[
+                apigateway.MethodResponse(status_code="200"),
+                apigateway.MethodResponse(status_code="400"),
+                apigateway.MethodResponse(status_code="500"),
+            ]
+        )
+
+        # route that gets hit whenever a game ends and user needs to post a highscore
+        posthighscore_resource = rest_api.root.add_resource("posthighscore")
+        posthighscore_integration = apigateway.LambdaIntegration(post_highscore_lambda)
+        posthighscore_method = posthighscore_resource.add_method(
+            "POST",
+            posthighscore_integration,
+            method_responses=[
+                apigateway.MethodResponse(status_code="200"),
+                apigateway.MethodResponse(status_code="400"),
+                apigateway.MethodResponse(status_code="500"),
+            ]
+        )
+
+
 
         CfnOutput(self, "Api Gateway", value=rest_api.url)
         CfnOutput(self, "CustomDomainTarget", value=custom_domain.domain_name_alias_domain_name)
