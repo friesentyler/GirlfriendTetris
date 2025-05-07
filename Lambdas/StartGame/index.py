@@ -1,6 +1,7 @@
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 import uuid
+import json
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('DeploymentStack-TempTable85935BBC-FHUB9N780SFL')
@@ -16,5 +17,5 @@ def handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": id
+        "body": json.dumps(id)
     }

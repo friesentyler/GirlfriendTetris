@@ -44,6 +44,14 @@ def handler(event, context):
                 })
             }
 
+        if player_name.length > 3:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({
+                    "error": "name can only be 3 characters"
+                })
+            }
+
         # this tries to ensure nobody has tampered with the frames, since they can only have small values
         score_table = {"1": "5", "2": "10", "3": "15", "4": "20"}
         for frame in game:
