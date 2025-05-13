@@ -12,6 +12,8 @@ class Game {
 		this.activePiece = [];
 		this.shadowPiece = [];
 		this.piecesDropped = 0;
+		this.frames = [];
+		this.score = 0;
 	}
 
 	generateGameboard(rows, columns) {
@@ -216,6 +218,7 @@ class Game {
 
 	clearLines() {
 		let i = this.rows - 1;
+		let rowsCleared = 0;
 		while (i >= 0) {
 			let isRowFull = this.gameBoard[i].reduce((accumulator, currentValue) => {
 				return accumulator * currentValue;
@@ -223,10 +226,13 @@ class Game {
 			if (isRowFull > 0) {
 				this.gameBoard[i] = this.gameBoard[i].map(x => x = 0);
 				this.shiftBoardDown(i);
+				rowsCleared++;
 			} else {
 				i--;
 			}
 		}
+		this.score += 5 * rowsCleared;
+		this.frames.push({ "score": rowsCleared * 5, "timestamp": Date.now(), "lines_cleared": rowsCleared })
 	}
 
 	shiftBoardDown(row) {

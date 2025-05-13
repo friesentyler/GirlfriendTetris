@@ -44,7 +44,7 @@ def handler(event, context):
                 })
             }
 
-        if player_name.length > 3:
+        if len(player_name) > 3:
             return {
                 "statusCode": 400,
                 "body": json.dumps({

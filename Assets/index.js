@@ -8,7 +8,7 @@ function main() {
 	const userGame = new Game();
 	console.log(userGame.gameBoard);
 	userGame.addPieceToBoard();
-	blitScreen(userGame.gameBoard);
+	blitScreen(userGame);
 
 	// THIS CODE ONLY MAKES SURE THAT THE PAUSE PLAY BUTTON ALWAYS WORKS, POSSIBLY REMOVE LATER
 	let pausePlay = document.querySelector('.play-front');
@@ -16,11 +16,43 @@ function main() {
 	pausePlay.addEventListener('click', (event) => togglePlayButton(event, userGame));
 	// END
 
+	const submitButton = document.querySelector('.submit-button');
+	async function submitPressed(userGame) {
+		let userName = document.querySelector('.name-box');
+		let postBody = {
+			"PlayerId": gameCode,
+			"PlayerName": userName.value,
+			"PlayerScore": userGame.score,
+			"Game": userGame.frames
+		}
+		await fetch('https://www.girlfriendtetris.com/posthighscore', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(postBody)
+		});
+		// reattaching all the events for the game
+		let reset = document.querySelector('.reset-button');
+		reset.addEventListener('touchstart', (event) => resetClicked(event, userGame));
+		reset.addEventListener('click', (event) => resetClicked(event, userGame));
+		gravityTick = setInterval(() => gravity(userGame), userGame.getTimerLengthFromPieceDrops());
+		document.addEventListener('touchstart', touchStartListener = (event) => handleTouchStart(event, userGame), false);
+		document.addEventListener('touchend', touchEndListener = (event) => handleTouchEnd(event, userGame), false);
+		document.addEventListener('touchmove', touchMoveListener = (event) => handleTouchMove(event, userGame), false);
+		document.addEventListener('keydown', keyDownListener = (event) => handleComputerArrows(event, userGame));
+		let highscoreMenu = document.querySelector('.highscore-modal');
+		highscoreMenu.style.display = "none";
+	}
+	submitButton.addEventListener('touchend', () => submitPressed(userGame));
+	submitButton.addEventListener('click', () => submitPressed(userGame));
+
 	startNewGame();
 	playGame(userGame);
 }
 
-function blitScreen(board) {
+function blitScreen(userGame) {
+	let board = userGame.gameBoard;
 	for (let i = 0; i < board.length; i++) {
 		for (let j = 0; j < board[0].length; j++) {
 			let block = document.getElementById(`${i}-${j}`);
@@ -45,6 +77,9 @@ function blitScreen(board) {
 			}
 		}
 	}
+	// update the score
+	let score = document.querySelector('.score-box');
+	score.textContent = userGame.score;
 }
 
 function gravity(userGame) {
@@ -56,7 +91,7 @@ function gravity(userGame) {
 			if (userGame.exertGravityOnBoard() === 1) {
 				userGame.clearLines();
 				if (userGame.addPieceToBoard() === -1) {
-					endGame();
+					endGame(userGame);
 					startNewGame();
 				}
 				timeRemainingForActivePieceToSolidify = 1000;
@@ -68,7 +103,7 @@ function gravity(userGame) {
 		}, timeRemainingForActivePieceToSolidify)
 
 	}
-	blitScreen(userGame.gameBoard);
+	blitScreen(userGame);
 }
 
 function handleSpeedUp(userGame) {
@@ -98,7 +133,7 @@ function handleGesture(userGame) {
 		} else if (touchendY > touchstartY) {
 			userGame.slamPiece();
 			userGame.generatePieceOutline();
-			blitScreen(userGame.gameBoard);
+			blitScreen(userGame);
 		}
 	}
 	if (touchendY === touchstartY && touchEndTime - touchStartTime < 120) {
@@ -108,7 +143,7 @@ function handleGesture(userGame) {
 			userGame.rotatePiece();
 		}
 		userGame.generatePieceOutline();
-		blitScreen(userGame.gameBoard);
+		blitScreen(userGame);
 	}
 }
 
@@ -163,12 +198,12 @@ function handleTouchMove(event, userGame) {
 			lastTouchX = event.changedTouches[0].screenX;
 			userGame.movePieceRight();
 			userGame.generatePieceOutline();
-			blitScreen(userGame.gameBoard);
+			blitScreen(userGame);
 		} else if (event.changedTouches[0].screenX < lastTouchX - 50) {
 			lastTouchX = event.changedTouches[0].screenX;
 			userGame.movePieceLeft();
 			userGame.generatePieceOutline();
-			blitScreen(userGame.gameBoard);
+			blitScreen(userGame);
 		}
 	}
 }
@@ -179,12 +214,12 @@ function handleComputerArrows(event, userGame) {
 		event.preventDefault();
 		userGame.movePieceLeft();
 		userGame.generatePieceOutline();
-		blitScreen(userGame.gameBoard);
+		blitScreen(userGame);
 	} else if (event.code === "ArrowRight") {
 		event.preventDefault();
 		userGame.movePieceRight();
 		userGame.generatePieceOutline();
-		blitScreen(userGame.gameBoard);
+		blitScreen(userGame);
 	} else if (event.code === "Space") {
 		event.preventDefault();
 		userGame.slamPiece();
@@ -192,7 +227,7 @@ function handleComputerArrows(event, userGame) {
 		// when the player advances to the next level
 		handleSlowDown(userGame);
 		userGame.generatePieceOutline();
-		blitScreen(userGame.gameBoard);
+		blitScreen(userGame);
 	} else if (event.code === "ArrowUp") {
 		event.preventDefault();
 		// ensures that if the piece has been placed the user gets the opportunity to rotate it 
@@ -202,7 +237,7 @@ function handleComputerArrows(event, userGame) {
 			userGame.rotatePiece();
 		}
 		userGame.generatePieceOutline();
-		blitScreen(userGame.gameBoard);
+		blitScreen(userGame);
 	} else if (event.code === "ArrowDown") {
 		event.preventDefault();
 		// have to add this so that the timer function gets updated with the new timeout value
@@ -210,7 +245,7 @@ function handleComputerArrows(event, userGame) {
 		handleSlowDown(userGame);
 		userGame.generatePieceOutline();
 		userGame.exertGravityOnBoard();
-		blitScreen(userGame.gameBoard);	// add code to speed up the falling here
+		blitScreen(userGame);	// add code to speed up the falling here
 	}
 }
 
@@ -251,12 +286,15 @@ function playGame(userGame) {
 	async function resetClicked(event) {
 		userGame.gameBoard = userGame.generateGameboard(20, 10);
 		userGame.activePiece = [];
+		userGame.score = 0;
+		userGame.frames = [];
+		console.log("clearing frames and score");
 		userGame.addPieceToBoard();
 		userGame.piecesDropped = 0;
 		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
-		endGame();
+		endGame(userGame);
 		startNewGame();
-		blitScreen(userGame.gameBoard);
+		blitScreen(userGame);
 	}
 
 	reset.addEventListener('touchstart', (event) => resetClicked(event, userGame));
@@ -304,16 +342,41 @@ async function startNewGame() {
 	gameCode = await gameCode.json();
 }
 
-async function endGame(postBody) {
+// REMOVE postBody AS A PARAM, JUST GET IT DIRECTLY FROM THE GAME VARIABLES INSTEAD OF PASSING IT IN
+async function endGame(userGame) {
 	// this resets a game session that over (or in progress if the the reset button was clicked)
 	let result = await fetch('https://www.girlfriendtetris.com/highscores')
 	result = await result.json();
 	result.sort((a, b) => Number(b.Score) - Number(a.Score));
 	if (result.length < 100) {
 		// add score since the highscore list is less than 100
+		let highscoreMenu = document.querySelector('.highscore-modal');
+		highscoreMenu.style.display = "initial";
+
+		// detaching all the events for the game
+		let reset = document.querySelector('.reset-button');
+		let newReset = reset.cloneNode(true);
+		reset.parentNode.replaceChild(newReset, reset);
+		clearInterval(gravityTick);
+		document.removeEventListener("touchstart", touchStartListener, false);
+		document.removeEventListener('touchend', touchEndListener, false);
+		document.removeEventListener('touchmove', touchMoveListener, false);
+		document.removeEventListener('keydown', keyDownListener);
 	} else {
-		if (Number(result[99].Score) < postBody.PlayerScore) {
+		if (Number(result[99].Score) < userGame.score) {
 			// display the highscore form and submit a request to the POST endpoint
+			let highscoreMenu = document.querySelector('.highscore-modal');
+			highscoreMenu.style.display = "initial";
+
+			// detaching all the events for the game
+			let reset = document.querySelector('.reset-button');
+			let newReset = reset.cloneNode(true);
+			reset.parentNode.replaceChild(newReset, reset);
+			clearInterval(gravityTick);
+			document.removeEventListener("touchstart", touchStartListener, false);
+			document.removeEventListener('touchend', touchEndListener, false);
+			document.removeEventListener('touchmove', touchMoveListener, false);
+			document.removeEventListener('keydown', keyDownListener);
 		} else {
 			// delete the gameCode for this game, and don't post, since the score wasn't high enough
 			await fetch('https://www.girlfriendtetris.com/deletegame', {
