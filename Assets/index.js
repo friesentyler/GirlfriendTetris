@@ -43,6 +43,8 @@ function main() {
 		document.addEventListener('keydown', keyDownListener = (event) => handleComputerArrows(event, userGame));
 		let highscoreMenu = document.querySelector('.highscore-modal');
 		highscoreMenu.style.display = "none";
+		userGame.score = 0;
+		userGame.frames = [];
 	}
 	submitButton.addEventListener('touchend', () => submitPressed(userGame));
 	submitButton.addEventListener('click', () => submitPressed(userGame));
@@ -87,15 +89,15 @@ function gravity(userGame) {
 	let isNewPieceGenerated = userGame.exertGravityOnBoard();
 	if (isNewPieceGenerated === 1) {
 		clearInterval(gravityTick);
-		setTimeout(() => {
+		setTimeout(async () => {
 			if (userGame.exertGravityOnBoard() === 1) {
 				userGame.clearLines();
-				if (userGame.addPieceToBoard() === -1) {
-					endGame(userGame);
-					startNewGame();
-				}
 				timeRemainingForActivePieceToSolidify = 1000;
 				handleSlowDown(userGame);
+				if (userGame.addPieceToBoard() === -1) {
+					await endGame(userGame);
+					await startNewGame();
+				}
 			} else {
 				timeRemainingForActivePieceToSolidify -= timeRemainingForActivePieceToSolidify / 4
 				handleSlowDown(userGame);
@@ -286,14 +288,12 @@ function playGame(userGame) {
 	async function resetClicked(event) {
 		userGame.gameBoard = userGame.generateGameboard(20, 10);
 		userGame.activePiece = [];
-		userGame.score = 0;
-		userGame.frames = [];
 		console.log("clearing frames and score");
 		userGame.addPieceToBoard();
 		userGame.piecesDropped = 0;
 		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
-		endGame(userGame);
-		startNewGame();
+		await endGame(userGame);
+		await startNewGame();
 		blitScreen(userGame);
 	}
 
