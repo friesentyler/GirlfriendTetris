@@ -231,8 +231,8 @@ class Game {
 				i--;
 			}
 		}
-		this.score += 5 * rowsCleared;
-		this.frames.push({ "score": rowsCleared * 5, "timestamp": Date.now(), "lines_cleared": rowsCleared })
+		this.score += 50 * rowsCleared;
+		this.frames.push({ "score": rowsCleared * 50, "timestamp": Date.now(), "lines_cleared": rowsCleared })
 	}
 
 	shiftBoardDown(row) {

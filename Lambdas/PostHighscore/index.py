@@ -53,7 +53,7 @@ def handler(event, context):
             }
 
         # this tries to ensure nobody has tampered with the frames, since they can only have small values
-        score_table = {"1": "5", "2": "10", "3": "15", "4": "20"}
+        score_table = {"1": "50", "2": "100", "3": "150", "4": "200"}
         for frame in game:
             if frame["lines_cleared"] in score_table and frame["score"] == score_table[frame["lines_cleared"]]:
                 return {
