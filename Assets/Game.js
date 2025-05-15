@@ -214,6 +214,8 @@ class Game {
 		}
 		this.clearLines();
 		this.addPieceToBoard();
+		this.score += 10;
+		this.frames.push({ "score": 10, "timestamp": Date.now(), "lines_cleared": 0 });
 	}
 
 	clearLines() {
@@ -231,8 +233,8 @@ class Game {
 				i--;
 			}
 		}
-		this.score += 50 * rowsCleared;
-		this.frames.push({ "score": rowsCleared * 50, "timestamp": Date.now(), "lines_cleared": rowsCleared })
+		this.score += 50 * rowsCleared * rowsCleared;
+		this.frames.push({ "score": rowsCleared * 50 * rowsCleared, "timestamp": Date.now(), "lines_cleared": rowsCleared });
 	}
 
 	shiftBoardDown(row) {
