@@ -193,7 +193,14 @@ function handleTouchStart(event, userGame) {
 	touchstartX = event.changedTouches[0].screenX;
 	touchstartY = event.changedTouches[0].screenY;
 	lastTouchX = event.changedTouches[0].screenX;
-	isSpeedUpEnabled = true;
+
+	clearTimeout(gameLoopManager.speedUpTimeout);
+	gameLoopManager.speedUpTimeout = setTimeout(() => {
+		console.log("Speed up activated");
+		gameLoopManager.setGravitySpeed(100);
+		gameLoopManager.speedUpActive = true;
+	}, 500);
+	//isSpeedUpEnabled = true;
 	//handleSpeedUp(userGame);
 }
 
@@ -201,6 +208,12 @@ function handleTouchEnd(event, userGame) {
 	console.log("touch end");
 	// had to put this in here because there was a bug that if you rotate the piece too fast it stops
 	// falling entirely, so we keep track of the time between touchEnds to call gravity()
+	clearTimeout(gameLoopManager.speedUpTimeout);
+	if (gameLoopManager.speedUpActive) {
+		console.log("Speed up deactivated");
+		gameLoopManager.setGravitySpeed(userGame.getTimerLengthFromPieceDrops());
+		gameLoopManager.speedUpActive = false;
+	}
 	if (Date.now() - touchEndTime < 250) {
 		accumulatedTimeBetweenTouchEnds += (Date.now() - touchEndTime)
 		if (accumulatedTimeBetweenTouchEnds > 250) {

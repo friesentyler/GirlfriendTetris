@@ -2,6 +2,7 @@ class GameLoopManager {
 	constructor(userGame, gravity, handleTouchStart, handleTouchEnd, handleTouchMove, handleComputerArrows, resetClicked, togglePlayButton, xClicked) {
 		this.userGame = userGame;
 		this.gravityTick = null;
+		this.currentIntervalMs = null;
 		this.running = false;
 		this.paused = false;
 		this.gravity = gravity;
@@ -21,6 +22,7 @@ class GameLoopManager {
 	start(resetElement, pausePlayElement, xElement) {
 		if (this.gravityTick) {
 			clearInterval(this.gravityTick);
+			this.gravityTick = null;
 		}
 		// WE NEED TO INSERT THE SPEED UP LOGIC HERE
 		// so basically the way i am thinking to do this is to add to the setInterval() callback function
@@ -30,7 +32,8 @@ class GameLoopManager {
 		//
 		// On top of that we need to pause the timer for one second if the piece has touched down due to the gravity
 		// if at the end of the one second timeout the piece is still touching the ground then we solidify the piece
-		this.gravityTick = setInterval(() => this.gravity(this.userGame), this.userGame.getTimerLengthFromPieceDrops());
+		this.setGravitySpeed(this.userGame.getTimerLengthFromPieceDrops());
+		//this.gravityTick = setInterval(() => this.gravity(this.userGame), this.userGame.getTimerLengthFromPieceDrops());
 		this.running = true;
 		this.paused = false;
 		this.attachInputListeners();
@@ -40,6 +43,7 @@ class GameLoopManager {
 	stop(resetElement, pausePlayElement, xElement) {
 		if (this.gravityTick) {
 			clearInterval(this.gravityTick);
+			this.gravityTick = null;
 		}
 		this.running = false;
 		this.detachInputListeners();
@@ -66,8 +70,23 @@ class GameLoopManager {
 
 	reset() {
 		this.stop();
-		this.userGame.resetBoard(); // You should move all the reset logic here
+		this.userGame.resetBoard();
 		this.start();
+	}
+
+	setGravitySpeed(speedMs) {
+		if (this.currentIntervalMs === speedMs && this.gravityTick !== null) return;
+
+		clearInterval(this.gravityTick);
+		this.gravityTick = null;
+		this.currentIntervalMs = speedMs;
+		this.gravityTick = setInterval(() => {
+			this.gravity(this.userGame);
+			const newSpeed = this.userGame.getTimerLengthFromPieceDrops();
+			if (newSpeed !== this.currentIntervalMs) {
+				this.setGravitySpeed(newSpeed);
+			}
+		}, speedMs);
 	}
 
 	attachInputListeners() {

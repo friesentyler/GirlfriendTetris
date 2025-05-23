@@ -329,7 +329,7 @@ class Game {
 
 	getTimerLengthFromPieceDrops() {
 		let level = Math.floor(this.piecesDropped / 50);
-		//console.log(`level: ${level} pieces dropped: ${this.piecesDropped} timer length: ${this.#timerLength - (0.1 * this.#timerLength * level)}`);
+		console.log(`level: ${level} pieces dropped: ${this.piecesDropped} timer length: ${this.#timerLength - (0.1 * this.#timerLength * level)}`);
 		return this.#timerLength - (0.1 * this.#timerLength * level);
 	}
 
