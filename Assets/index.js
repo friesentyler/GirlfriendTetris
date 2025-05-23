@@ -103,24 +103,6 @@ async function solidifyPiece(userGame) {
 	}
 }
 
-function handleSpeedUp(userGame) {
-	// so this gets triggered when a touch start is fired
-	// if there is no touchmoves fired within a certain duration of time we assume the player
-	// wants to speed up the piece falling
-	// just reset the gravityTick interval to a different duration
-	setTimeout(() => {
-		if (isSpeedUpEnabled) {
-			clearInterval(gravityTick);
-			gravityTick = setInterval(() => gravity(userGame), 100);
-		}
-	}, 500)
-}
-
-function handleSlowDown(userGame) {
-	clearInterval(gravityTick);
-	gravityTick = setInterval(() => gravity(userGame), userGame.getTimerLengthFromPieceDrops());
-}
-
 function handleGesture(userGame) {
 	let xDirection = touchendX - touchstartX;
 	let yDirection = touchendY - touchstartY;
@@ -177,13 +159,6 @@ function handleTouchEnd(event, userGame) {
 		console.log("Speed up deactivated");
 		gameLoopManager.setGravitySpeed(userGame.getTimerLengthFromPieceDrops());
 		gameLoopManager.speedUpActive = false;
-	}
-	if (Date.now() - touchEndTime < 250) {
-		accumulatedTimeBetweenTouchEnds += (Date.now() - touchEndTime)
-		if (accumulatedTimeBetweenTouchEnds > 250) {
-			accumulatedTimeBetweenTouchEnds = 0;
-			gravity(userGame);
-		}
 	}
 	touchEndTime = Date.now();
 	event.preventDefault();
@@ -411,23 +386,14 @@ async function resetClicked(event, userGame) {
 
 // I really hate making more global variables for tracking the event listeners, but it seems like the only good way to
 // remove them later
-var touchStartListener = null;
-var touchEndListener = null;
-var touchMoveListener = null;
-var keyDownListener = null;
-var xClickedListener = null;
-
 var touchstartX = 0;
 var touchstartY = 0;
 var touchendX = 0;
 var touchendY = 0;
 var lastTouchX = 0;
-var isSpeedUpEnabled = false;
 var touchStartTime = 0;
 var touchEndTime = 0;
-var gravityTick = 0;
 var accumulatedTimeBetweenTouchEnds = 0;
-var timeRemainingForActivePieceToSolidify = 1000;
 var gameCode = 0;
 var gameLoopManager = null;
 
