@@ -1,11 +1,16 @@
 class GameLoopManager {
-	constructor(userGame, gravity, handleTouchStart, handleTouchEnd, handleTouchMove, handleComputerArrows, resetClicked, togglePlayButton, xClicked) {
+	constructor(userGame, gravity, solidifyPiece, handleTouchStart, handleTouchEnd, handleTouchMove, handleComputerArrows, resetClicked, togglePlayButton, xClicked) {
 		this.userGame = userGame;
 		this.gravityTick = null;
 		this.currentIntervalMs = null;
 		this.running = false;
 		this.paused = false;
 		this.gravity = gravity;
+		this.solidifyPiece = solidifyPiece;
+		this.inputAfterTouchDownCount = 0;
+		this.inputAfterTouchDownLimit = 10;
+		this.touchDownTimeout = null;
+		this.touchDownPending = false;
 		this.touchStartListener = null;
 		this.touchEndListener = null;
 		this.touchMoveListener = null;
@@ -24,16 +29,7 @@ class GameLoopManager {
 			clearInterval(this.gravityTick);
 			this.gravityTick = null;
 		}
-		// WE NEED TO INSERT THE SPEED UP LOGIC HERE
-		// so basically the way i am thinking to do this is to add to the setInterval() callback function
-		// a way to check the current timeout value against the one set by the game. If these differ than we need
-		// to unattach the interval if the boolean for "swipedown" is true (within this start() function) and 
-		// then reattach it with the proper interval length.
-		//
-		// On top of that we need to pause the timer for one second if the piece has touched down due to the gravity
-		// if at the end of the one second timeout the piece is still touching the ground then we solidify the piece
 		this.setGravitySpeed(this.userGame.getTimerLengthFromPieceDrops());
-		//this.gravityTick = setInterval(() => this.gravity(this.userGame), this.userGame.getTimerLengthFromPieceDrops());
 		this.running = true;
 		this.paused = false;
 		this.attachInputListeners();
@@ -80,13 +76,38 @@ class GameLoopManager {
 		clearInterval(this.gravityTick);
 		this.gravityTick = null;
 		this.currentIntervalMs = speedMs;
-		this.gravityTick = setInterval(() => {
-			this.gravity(this.userGame);
-			const newSpeed = this.userGame.getTimerLengthFromPieceDrops();
-			if (newSpeed !== this.currentIntervalMs) {
-				this.setGravitySpeed(newSpeed);
+
+		this.gravityTick = setInterval(async () => {
+			const gravityResult = this.gravity(this.userGame);
+			if (gravityResult === "landed") {
+				if (!this.touchDownPending) {
+					this.touchDownPending = true;
+					this.inputAfterTouchDownCount = 0;
+					this.touchDownTimeout = setTimeout(async () => {
+						if (this.userGame.isTouchingDown()) {
+							await this.solidifyPiece(this.userGame);
+						}
+						this.touchDownPending = false;
+						this.touchDownTimeout = null;
+					}, 1000);
+				}
+			}
+			// Recheck speed and reschedule loop if necessary
+			if (!this.speedUpActive) {
+				const newSpeed = this.userGame.getTimerLengthFromPieceDrops();
+				if (newSpeed !== this.currentIntervalMs) {
+					this.setGravitySpeed(newSpeed);
+				}
 			}
 		}, speedMs);
+	}
+
+	clearTouchDownTimeout() {
+		if (this.touchDownTimeout) {
+			clearTimeout(this.touchDownTimeout);
+			this.touchDownTimeout = null;
+			this.touchDownPending = false;
+		}
 	}
 
 	attachInputListeners() {
@@ -108,8 +129,6 @@ class GameLoopManager {
 		resetElement.addEventListener('click', (event) => this.resetClicked(event, this.userGame));
 		pausePlayElement.addEventListener('touchstart', (event) => this.togglePlayButton(event, this.userGame));
 		pausePlayElement.addEventListener('click', (event) => this.togglePlayButton(event, this.userGame));
-		//xElement.addEventListener('touchend', (event) => this.xClicked(event, this.userGame));
-		//xElement.addEventListener('click', (event) => this.xClicked(event, this.userGame));
 	}
 
 	detachButtonListeners(resetElement, pausePlayElement, xElement) {
@@ -117,8 +136,6 @@ class GameLoopManager {
 		resetElement.parentNode.replaceChild(newReset, resetElement);
 		let newPausePlay = pausePlayElement.cloneNode(true);
 		pausePlayElement.parentNode.replaceChild(newPausePlay, pausePlayElement);
-		//let newXButton = xElement.cloneNode(true);
-		//xElement.parentNode.replaceChild(newXButton, xElement);
 	}
 }
 

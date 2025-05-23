@@ -2,6 +2,9 @@ import Game from './Game.js';
 import GameLoopManager from './GameLoopManager.js';
 import * as tetriminoModule from './tetriminos.js';
 
+// REMOVE ALL REFERENCES TO ADDING OR REMOVING EVENT LISTENERS TO PAUSEPLAY, XBUTTONCLICKED, OR RESETCLICKED.
+// GAMELOOPMANAGER SHOULD BE HANDLING THESE NOW
+
 // the main function loop where the updates happen
 function main() {
 	console.log("Game started!");
@@ -10,6 +13,12 @@ function main() {
 	console.log(userGame.gameBoard);
 	userGame.addPieceToBoard();
 	blitScreen(userGame);
+
+	// THIS CODE ONLY MAKES SURE THAT THE PAUSE PLAY BUTTON ALWAYS WORKS, POSSIBLY REMOVE LATER
+	//let pausePlay = document.querySelector('.play-front');
+	//pausePlay.addEventListener('touchstart', (event) => togglePlayButton(event, userGame));
+	//pausePlay.addEventListener('click', (event) => togglePlayButton(event, userGame));
+	// END
 
 	const submitButton = document.querySelector('.submit-button');
 	async function submitPressed(userGame) {
@@ -31,7 +40,25 @@ function main() {
 		let reset = document.querySelector('.reset-button');
 		let pausePlay = document.querySelector('.play-front');
 		let xButton = document.querySelector('.x-button');
+		/*async function resetClicked(event) {
+			userGame.gameBoard = userGame.generateGameboard(20, 10);
+			userGame.activePiece = [];
+			console.log("clearing frames and score");
+			userGame.addPieceToBoard();
+			userGame.piecesDropped = 0;
+			// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
+			await endGame(userGame);
+			await startNewGame();
+			blitScreen(userGame);
+		}
+		reset.addEventListener('touchstart', (event) => resetClicked(event, userGame));
+		reset.addEventListener('click', (event) => resetClicked(event, userGame));*/
+		//gravityTick = setInterval(() => gravity(userGame), userGame.getTimerLengthFromPieceDrops());
 		gameLoopManager.start(reset, pausePlay, xButton);
+		/*document.addEventListener('touchstart', touchStartListener = (event) => handleTouchStart(event, userGame), false);
+		document.addEventListener('touchend', touchEndListener = (event) => handleTouchEnd(event, userGame), false);
+		document.addEventListener('touchmove', touchMoveListener = (event) => handleTouchMove(event, userGame), false);
+		document.addEventListener('keydown', keyDownListener = (event) => handleComputerArrows(event, userGame));*/
 		let highscoreMenu = document.querySelector('.highscore-modal');
 		highscoreMenu.style.display = "none";
 		userGame.score = 0;
@@ -88,6 +115,11 @@ function gravity(userGame) {
 	userGame.generatePieceOutline();
 	let isNewPieceGenerated = userGame.exertGravityOnBoard();
 	if (isNewPieceGenerated === 1) {
+		/*userGame.clearLines();
+		if (userGame.addPieceToBoard() === -1) {
+			await endGame(userGame);
+			await startNewGame();
+		}*/
 		blitScreen(userGame);
 		return "landed";
 	}
@@ -155,6 +187,7 @@ function togglePlayButton(event, userGame) {
 }
 
 function handleTouchStart(event, userGame) {
+	console.log("touch start");
 	touchStartTime = Date.now();
 	event.preventDefault();
 	touchstartX = event.changedTouches[0].screenX;
@@ -167,9 +200,12 @@ function handleTouchStart(event, userGame) {
 		gameLoopManager.setGravitySpeed(100);
 		gameLoopManager.speedUpActive = true;
 	}, 500);
+	//isSpeedUpEnabled = true;
+	//handleSpeedUp(userGame);
 }
 
 function handleTouchEnd(event, userGame) {
+	console.log("touch end");
 	// had to put this in here because there was a bug that if you rotate the piece too fast it stops
 	// falling entirely, so we keep track of the time between touchEnds to call gravity()
 	clearTimeout(gameLoopManager.speedUpTimeout);
@@ -186,6 +222,8 @@ function handleTouchEnd(event, userGame) {
 		}
 	}
 	touchEndTime = Date.now();
+	//isSpeedUpEnabled = false;
+	//handleSlowDown(userGame);
 	event.preventDefault();
 	touchendX = event.changedTouches[0].screenX;
 	touchendY = event.changedTouches[0].screenY;
@@ -237,6 +275,7 @@ function handleTouchMove(event, userGame) {
 
 function handleComputerArrows(event, userGame) {
 	console.log("computer arrow");
+	//console.log(event.code);
 	let moved = false;
 	if (event.code === "ArrowLeft") {
 		event.preventDefault();
@@ -251,6 +290,9 @@ function handleComputerArrows(event, userGame) {
 	} else if (event.code === "Space") {
 		event.preventDefault();
 		userGame.slamPiece();
+		// have to add this so that the timer function gets updated with the new timeout value
+		// when the player advances to the next level
+		//handleSlowDown(userGame);
 		userGame.generatePieceOutline();
 		blitScreen(userGame);
 	} else if (event.code === "ArrowUp") {
@@ -266,6 +308,9 @@ function handleComputerArrows(event, userGame) {
 		blitScreen(userGame);
 	} else if (event.code === "ArrowDown") {
 		event.preventDefault();
+		// have to add this so that the timer function gets updated with the new timeout value
+		// when the player advances to the next level
+		//handleSlowDown(userGame);
 		userGame.generatePieceOutline();
 		userGame.exertGravityOnBoard();
 		blitScreen(userGame);
@@ -301,6 +346,18 @@ function xClicked(event, userGame) {
 }
 
 function pauseGame(userGame) {
+	/*let reset = document.querySelector('.reset-button');
+	let newReset = reset.cloneNode(true);
+	reset.parentNode.replaceChild(newReset, reset);*/
+
+	//clearInterval(gravityTick);
+	// notice that the functions we remove on these events are named arrow functions, the names are global
+	// variables defined at the bottom of the file. Could possibly have weird side effects later
+	/*document.removeEventListener("touchstart", touchStartListener, false);
+	document.removeEventListener('touchend', touchEndListener, false);
+	document.removeEventListener('touchmove', touchMoveListener, false);
+	document.removeEventListener('keydown', keyDownListener);*/
+
 	let reset = document.querySelector('.reset-button');
 	let pausePlay = document.querySelector('.play-front');
 	let xButton = document.querySelector('.x-button');
@@ -309,14 +366,48 @@ function pauseGame(userGame) {
 	// display the pause menu
 	let pauseMenu = document.querySelector('.pause-menu-modal');
 	pauseMenu.style.display = "initial";
+	/*let xButton = document.querySelector('.x-button');
+	xClickedListener = (event) => xClicked(event, userGame);
+	xButton.addEventListener('touchend', xClickedListener);
+	xButton.addEventListener('click', xClickedListener);*/
 	getHighscores();
 }
 
 function playGame(userGame) {
+	/*let reset = document.querySelector('.reset-button');
+	async function resetClicked(event) {
+		userGame.gameBoard = userGame.generateGameboard(20, 10);
+		userGame.activePiece = [];
+		console.log("clearing frames and score");
+		userGame.addPieceToBoard();
+		userGame.piecesDropped = 0;
+		// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
+		await endGame(userGame);
+		await startNewGame();
+		blitScreen(userGame);
+	}
+
+	reset.addEventListener('touchstart', (event) => resetClicked(event, userGame));
+	reset.addEventListener('click', (event) => resetClicked(event, userGame));*/
+
 	let reset = document.querySelector('.reset-button');
 	let pausePlay = document.querySelector('.play-front');
 	let xButton = document.querySelector('.x-button');
 	gameLoopManager.start(reset, pausePlay, xButton);
+
+	//gravityTick = setInterval(() => gravity(userGame), userGame.getTimerLengthFromPieceDrops());
+
+	/*document.addEventListener('touchstart', touchStartListener = (event) => handleTouchStart(event, userGame), false);
+	document.addEventListener('touchend', touchEndListener = (event) => handleTouchEnd(event, userGame), false);
+	document.addEventListener('touchmove', touchMoveListener = (event) => handleTouchMove(event, userGame), false);
+	document.addEventListener('keydown', keyDownListener = (event) => handleComputerArrows(event, userGame));*/
+
+
+
+	// remove the x button listeners
+	/*let xButton = document.querySelector('.x-button');
+	xButton.removeEventListener('touchend', xClickedListener);
+	xButton.removeEventListener('click', xClickedListener);*/
 }
 
 async function getHighscores() {
@@ -359,20 +450,40 @@ async function endGame(userGame) {
 		let highscoreMenu = document.querySelector('.highscore-modal');
 		highscoreMenu.style.display = "initial";
 
+		// detaching all the events for the game
+		/*let reset = document.querySelector('.reset-button');
+		let newReset = reset.cloneNode(true);
+		reset.parentNode.replaceChild(newReset, reset);*/
+
 		let reset = document.querySelector('.reset-button');
 		let pausePlay = document.querySelector('.play-front');
 		let xButton = document.querySelector('.x-button');
 		gameLoopManager.stop(reset, pausePlay, xButton);
+		//clearInterval(gravityTick);
+		/*document.removeEventListener("touchstart", touchStartListener, false);
+		document.removeEventListener('touchend', touchEndListener, false);
+		document.removeEventListener('touchmove', touchMoveListener, false);
+		document.removeEventListener('keydown', keyDownListener);*/
 	} else {
 		if (Number(result[99].Score) < userGame.score) {
 			// display the highscore form and submit a request to the POST endpoint
 			let highscoreMenu = document.querySelector('.highscore-modal');
 			highscoreMenu.style.display = "initial";
 
+			// detaching all the events for the game
+			/*let reset = document.querySelector('.reset-button');
+			let newReset = reset.cloneNode(true);
+			reset.parentNode.replaceChild(newReset, reset);*/
+
 			let reset = document.querySelector('.reset-button');
 			let pausePlay = document.querySelector('.play-front');
 			let xButton = document.querySelector('.x-button');
 			gameLoopManager.stop(reset, pausePlay, xButton);
+			//clearInterval(gravityTick);
+			/*document.removeEventListener("touchstart", touchStartListener, false);
+			document.removeEventListener('touchend', touchEndListener, false);
+			document.removeEventListener('touchmove', touchMoveListener, false);
+			document.removeEventListener('keydown', keyDownListener);*/
 		} else {
 			// delete the gameCode for this game, and don't post, since the score wasn't high enough
 			await fetch('https://www.girlfriendtetris.com/deletegame', {

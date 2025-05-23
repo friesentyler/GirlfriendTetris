@@ -40,7 +40,6 @@ class Game {
 			this.addPieceToBoard();
 			this.piecesDropped = 0;
 			return -1;
-			// TODO, WHEN SCORING IS ADDED MAKE SURE TO DO THE SCORE RESET LOGIC HERE TOO
 		}
 	}
 
@@ -70,13 +69,8 @@ class Game {
 				this.activePiece[i][0]++;
 			}
 		} else {
-			// ok so here we need to put the logic for allowing the piece to be temporarily rotated
-			// after being set down. I would prefer that there is no timer logic in the 
-			// Game.js to keep it clean. which most likely means moving the clearLines() and
-			// addPieceToBoard() to a different function
+
 			console.log("Generate new piece!");
-			//this.clearLines();
-			//this.addPieceToBoard();
 			return 1;
 		}
 	}
@@ -190,6 +184,7 @@ class Game {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1] - 1] = 1 * this.activeColor;
 				this.activePiece[i][1]--;
 			}
+			return true;
 		}
 	}
 
@@ -205,6 +200,7 @@ class Game {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1] + 1] = 1 * this.activeColor;
 				this.activePiece[i][1]++;
 			}
+			return true;
 		}
 	}
 
@@ -314,6 +310,7 @@ class Game {
 			for (let i = 0; i < this.activePiece.length; i++) {
 				this.gameBoard[this.activePiece[i][0]][this.activePiece[i][1]] = 1 * this.activeColor;
 			}
+			return true;
 		} else {
 			return -1;
 		}
@@ -329,7 +326,7 @@ class Game {
 
 	getTimerLengthFromPieceDrops() {
 		let level = Math.floor(this.piecesDropped / 50);
-		console.log(`level: ${level} pieces dropped: ${this.piecesDropped} timer length: ${this.#timerLength - (0.1 * this.#timerLength * level)}`);
+		//console.log(`level: ${level} pieces dropped: ${this.piecesDropped} timer length: ${this.#timerLength - (0.1 * this.#timerLength * level)}`);
 		return this.#timerLength - (0.1 * this.#timerLength * level);
 	}
 
@@ -341,6 +338,11 @@ class Game {
 			this.gameBoard[this.activePiece[i][0] - 1][this.activePiece[i][1]] = 1 * this.activeColor;
 			this.activePiece[i][0]--;
 		}
+	}
+
+	isTouchingDown() {
+		const hypotheticalPiece = this.activePiece.map(([row, col]) => [row + 1, col]);
+		return !this.validGravityMove(hypotheticalPiece);
 	}
 }
 
